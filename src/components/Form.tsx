@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
-
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Switch } from '@/components/ui/switch';

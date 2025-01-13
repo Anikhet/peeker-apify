@@ -1,7 +1,9 @@
 // import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { headers } from 'next/headers';
-import supabaseAdmin from '@/lib/supabaseAdmin';
+// import { create } from 'domain';
+import { createClient } from '@supabase/supabase-js';
+
 // import { runExportApollo } from './runExportApollo';
 // import { use } from 'react';
 // import { supabaseAdmin } from '@/lib/supabase/supabaseAdmin';
@@ -16,7 +18,9 @@ export async function POST(req: Request): Promise<void | Response> {
 	const endpointSecret = process.env.STRIPE_WEBHOOK_SIGNING_SECRET;
 	let event;
 
-	const supabase = supabaseAdmin;
+	const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+	const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+		const supabase = createClient(supabaseUrl, supabaseKey);
 
 	// Verify webhook signature and extract the event.
 	// See https://stripe.com/docs/webhooks#verify-events for more information.

@@ -6,7 +6,9 @@ import { createClient } from '@supabase/supabase-js';
 import { redirect } from 'next/navigation';
 
 export async function portal(id: string) {
-	const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+	const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+	const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+		const supabase = createClient(supabaseUrl, supabaseKey);
 	const { data: customer, error: customerError } = await supabase.from('user').select('*').eq('id', id).limit(1).single();
 	if (customerError) throw customerError;
 

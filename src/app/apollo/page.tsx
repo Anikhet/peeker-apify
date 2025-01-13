@@ -1,10 +1,10 @@
 import BuyApollo from '@/components/Form'
-import React from 'react'
+import React, { Suspense } from 'react'
 
 const page = () => {
   return (
     <div>
-        <BuyApollo/>
+       <Suspense> <BuyApollo/></Suspense>
     </div>
   )
 }
