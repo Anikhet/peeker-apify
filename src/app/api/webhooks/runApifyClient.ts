@@ -3,7 +3,7 @@ import Stripe from 'stripe';
 
 export async function runApifyClient(session: Stripe.Checkout.Session) {
     try {
-        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2024-09-30.acacia' });
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2024-12-18.acacia' });
 
         const client = new ApifyClient({
             token: process.env.MOHIT_APIFY_KEY,

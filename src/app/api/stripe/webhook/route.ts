@@ -1,15 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
+// import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { headers } from 'next/headers';
-import { runExportApollo } from './runExportApollo';
-import { use } from 'react';
-import { supabaseAdmin } from '@/lib/supabase/supabaseAdmin';
+import supabaseAdmin from '@/lib/supabaseAdmin';
+// import { runExportApollo } from './runExportApollo';
+// import { use } from 'react';
+// import { supabaseAdmin } from '@/lib/supabase/supabaseAdmin';
 
 export async function POST(req: Request): Promise<void | Response> {
 	const headersList = await headers();
 	const signature = headersList.get('stripe-signature');
 	const stripe = new Stripe(process.env.STRIPE_API_KEY as string, {
-		apiVersion: '2024-09-30.acacia',
+		apiVersion: '2024-12-18.acacia',
 		httpClient: Stripe.createFetchHttpClient(),
 	});
 	const endpointSecret = process.env.STRIPE_WEBHOOK_SIGNING_SECRET;

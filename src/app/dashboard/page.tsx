@@ -2,11 +2,12 @@
 import { supabase } from '@/lib/supabaseClient';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { User } from '@supabase/supabase-js';
 import BuyApollo from '@/components/Form';
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<unknown>(null);
+  const [user, setUser] = useState<User | null>(null); // Correctly type the user
   const router = useRouter();
 
   useEffect(() => {
@@ -15,7 +16,7 @@ const Dashboard = () => {
       if (!session) {
         router.push('/auth'); // Redirect to login if not authenticated
       } else {
-        setUser(session.user);
+        setUser(session.user); // Set the user correctly
         setLoading(false);
       }
     };

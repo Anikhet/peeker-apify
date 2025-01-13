@@ -1,14 +1,16 @@
 import { type NextRequest } from 'next/server';
-
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
-import { revalidatePath } from 'next/cache';
+import { createClient } from '@supabase/supabase-js';
+
+// import { createClient } from '@/lib/supabase/server';
+// import { revalidatePath } from 'next/cache';
 
 export async function POST(request: NextRequest) {
 	const { credential, next } = await request.json();
-
+	const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 	if (credential) {
-		const supabase = createClient();
+		const supabase = createClient( supabaseUrl, supabaseAnonKey);
 
 		console.log('credential', credential);
 

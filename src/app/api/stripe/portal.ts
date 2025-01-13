@@ -1,11 +1,12 @@
 'use server';
 
 import { stripe } from '@/lib/stripe';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@supabase/supabase-js';
+// import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 
 export async function portal(id: string) {
-	const supabase = createClient();
+	const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
 	const { data: customer, error: customerError } = await supabase.from('user').select('*').eq('id', id).limit(1).single();
 	if (customerError) throw customerError;
 
