@@ -37,6 +37,7 @@ export async function POST(req: Request): Promise<void | Response> {
 		let retrievedEvent;
 
 		// Retrieve the event from the Stripe API
+		// eslint-disable-next-line prefer-const
 		retrievedEvent = await stripe.events.retrieve(event.id, requestOptions);
 
 		// if (event === "checkout.session.completed") {
@@ -173,7 +174,7 @@ export async function POST(req: Request): Promise<void | Response> {
 				const subscription = retrievedEvent.data.object as Stripe.Subscription;
 				console.log(subscription);
 				const stripe_customer_id = subscription.customer;
-				const valid_to = subscription.cancel_at_period_end ? subscription.current_period_end : subscription.ended_at;
+				// const valid_to = subscription.cancel_at_period_end ? subscription.current_period_end : subscription.ended_at;
 				const { error: errorUpsertSub } = await supabase
 					.from('organization')
 					.update({

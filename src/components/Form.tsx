@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import React, { ChangeEvent, useEffect, useState } from 'react';
@@ -13,22 +14,22 @@ import { cn } from '@/lib/utils';
 import { useSearchParams } from 'next/navigation';
 
 export default function BuyApollo() {
-	const [isLoading, setLoading] = useState<boolean>(false);
+	const [, setLoading] = useState<boolean>(false);
 	const [isSuccess, setIsSuccess] = useState(false);
 
 	// Individual states for every toggle switch
 	const [personalEmails, setPersonalEmails] = useState<boolean>(false);
 	const [workEmails, setWorkEmails] = useState<boolean>(false);
-	const [isExtraColumns, setExtraColumns] = useState<boolean>(false);
+	// const [isExtraColumns, setExtraColumns] = useState<boolean>(false);
 	// const [usePeekerCredits, setUsePeekerCredits] = useState<boolean>(false);
 
 	// State for form data
-	const [listName, setListName] = useState<string>();
+	// const [listName, setListName] = useState<string>();
 	const [apolloURL, setApolloURL] = useState<string>();
 	const [leadCount, setLeadCount] = useState<number>();
 
 	// Validation error states for input fields
-	const [isListNameInvalid, setIsListNameInvalid] = useState(false);
+	// const [isListNameInvalid, setIsListNameInvalid] = useState(false);
 	const [isApolloURLInvalid, setIsApolloURLInvalid] = useState(false);
 	const [isLeadCountInvalid, setIsLeadCountInvalid] = useState(false);
 
@@ -163,7 +164,7 @@ export default function BuyApollo() {
 		if (session) {
 			setIsSuccess(true);
 		}
-	}, []);
+	}, [searchParams]);
 
 	return (
 		<div className='w-full'>
@@ -221,7 +222,7 @@ export default function BuyApollo() {
 										<Info className='size-4' /> Good to know
 									</span>
 									<Label className='text-muted-foreground'>
-										Set the Apollo link to only scrape leads with emails available. Ignore if you've already set email
+										Set the Apollo link to only scrape leads with emails available. Ignore if you&apos;ve already set email
 										status filter in Apollo
 									</Label>
 								</div>

@@ -27,8 +27,12 @@ const Auth = () => {
 	  if (error) throw error;
 	  setSuccess('OTP sent to your email. Please check your inbox.');
 	  setStage('verify'); // Move to OTP verification stage
-	} catch (err: any) {
-	  setError(err.message || 'Something went wrong. Please try again.');
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      setError(err.message || 'Something went wrong. Please try again.');
+    } else {
+      setError('Something went wrong. Please try again.');
+    }
 	} finally {
 	  setLoading(false);
 	}
@@ -50,8 +54,12 @@ const Auth = () => {
       if (error) throw error;
       setSuccess('OTP verified successfully!');
       router.push('/dashboard'); // Redirect to dashboard after verification
-    } catch (err: any) {
-      setError(err.message || 'Invalid OTP. Please try again.');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || 'Invalid OTP. Please try again.');
+      } else {
+        setError('Invalid OTP. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -70,8 +78,12 @@ const Auth = () => {
         },
       });
       if (error) throw error;
-    } catch (err: any) {
-      setError(err.message || 'Google login failed. Please try again.');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || 'Google login failed. Please try again.');
+      } else {
+        setError('Google login failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

@@ -12,10 +12,10 @@ export function splitTextIntoKeyValuePairs(txt: string) {
 	// Split the URL into chunks of maxValueLength
 	for (let i = 0; i < txt.length; i += maxValueLength) {
 		// Generate a key for each chunk, e.g., key1, key2, ..., key50
-		let key = `split_key_${index}`;
+		const key = `split_key_${index}`;
 
 		// Extract a chunk of maxValueLength from the URL
-		let value = txt.substring(i, i + maxValueLength);
+		const value = txt.substring(i, i + maxValueLength);
 
 		// Add the key-value pair to the array
 		dict[key] = value;
@@ -37,10 +37,10 @@ export function glueKeyValuePairs(keyValuePairs: Record<string, string>) {
 	let rebuilt = '';
 
 	// filter out the keys that are not url_key
-	const filteredKeys = Object.entries(keyValuePairs).filter(([key, _]) => key.includes('split_key_'));
+	const filteredKeys = Object.entries(keyValuePairs).filter(([key]) => key.includes('split_key_'));
 
 	// Iterate over the key-value pairs
-	filteredKeys.forEach(([_, value]) => {
+	filteredKeys.forEach(([, value]) => {
 		// Concatenate the value from each pair to the rebuilt URL
 		rebuilt += value;
 	});

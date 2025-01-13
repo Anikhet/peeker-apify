@@ -6,7 +6,7 @@ import { runApifyClient } from './runApifyClient';
 import { scrapeAndExportToCsv } from '@/components/utils/dataset-formatter/apify-formatter/route';
 import { sendEmail } from '@/components/utils/emailNotificationService/route';
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest) {
 	const payload = await req.text();
 
 	const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2024-12-18.acacia' });

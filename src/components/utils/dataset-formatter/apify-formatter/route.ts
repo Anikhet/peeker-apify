@@ -21,7 +21,7 @@ export interface DatasetItem {
     country: string;
 }
 
-export async function scrapeAndExportToCsv(dataset: any ) {
+export async function scrapeAndExportToCsv(dataset: unknown ) {
     try {
         const primaryFields = [
             'Website',
@@ -40,7 +40,7 @@ export async function scrapeAndExportToCsv(dataset: any ) {
         ];
 
         // Extract and reorder fields
-        const mappedItems = dataset.map((item: DatasetItem) => {
+        const mappedItems = (dataset as DatasetItem[]).map((item: DatasetItem) => {
             const reorderedItem: Record<string, string> = {};
 
             // Add primary fields first
