@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { headers } from 'next/headers';
 import { runApifyClient } from './runApifyClient';
-// import { scrapeAndExportToCsv,DatasetItem } from '../dataset-formatter/apify-formatter/route';
-import { sendEmail } from '../emailNotificationService/route';
+
 import { scrapeAndExportToCsv } from '@/components/utils/dataset-formatter/apify-formatter/route';
+import { sendEmail } from '@/components/utils/emailNotificationService/route';
 
 export async function POST(req: NextRequest, res: NextResponse) {
 	const payload = await req.text();

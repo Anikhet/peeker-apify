@@ -22,7 +22,6 @@ const Auth = () => {
 	  const { error } = await supabase.auth.signInWithOtp({
 		email,
 		options: {
-		  type: 'email_otp', // Specify OTP instead of magic link
 		},
 	  });
 	  if (error) throw error;
