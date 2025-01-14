@@ -11,33 +11,23 @@ import { Info } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useSearchParams } from 'next/navigation';
+import { RainbowButton } from './ui/rainbow-button';
 
 export default function BuyApollo() {
 	const [, setLoading] = useState<boolean>(false);
 	const [isSuccess, setIsSuccess] = useState(false);
 
-	// Individual states for every toggle switch
 	const [personalEmails, setPersonalEmails] = useState<boolean>(false);
 	const [workEmails, setWorkEmails] = useState<boolean>(false);
-	// const [isExtraColumns, setExtraColumns] = useState<boolean>(false);
-	// const [usePeekerCredits, setUsePeekerCredits] = useState<boolean>(false);
 
-	// State for form data
-	// const [listName, setListName] = useState<string>();
 	const [apolloURL, setApolloURL] = useState<string>();
 	const [leadCount, setLeadCount] = useState<number>();
 
-	// Validation error states for input fields
-	// const [isListNameInvalid, setIsListNameInvalid] = useState(false);
 	const [isApolloURLInvalid, setIsApolloURLInvalid] = useState(false);
 	const [isLeadCountInvalid, setIsLeadCountInvalid] = useState(false);
 
-	// State for the price
 	const [price, setPrice] = useState(0);
 
-	// // State for leads downloading instructions
-	// const [leadsToInbox, setleadsToInbox] = useState(false);
-	// // const [addLeadsToCampaign, setaddLeadsToCampaign] = useState(false);
 
 	const handleLeadCountChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const value = parseInt(e.target.value);
@@ -53,31 +43,12 @@ export default function BuyApollo() {
 		}
 	};
 
-	// // Real-time validation for List Name
-	// const handleListNameChange = (e: ChangeEvent<HTMLInputElement>) => {
-	// 	const value = e.target.value;
-	// 	setListName(value);
 
-	// 	// Validate List Name in real time
-	// 	if (value.trim() === '') {
-	// 		setIsListNameInvalid(true);
-	// 	} else {
-	// 		setIsListNameInvalid(false); // Reset if valid
-	// 	}
-	// };
 
 	// Real-time validation for Apollo URL
 	const handleURLChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setApolloURL(value);
-
-		// Validate Apollo URL in real time
-		// const isValidURL = /^https:\/\/app\.apollo\.io\/$/.test(value.trim());
-		// if (!isValidURL) {
-		// 	setIsApolloURLInvalid(true);
-		// } else {
-		// 	setIsApolloURLInvalid(false); // Reset if valid
-		// }
 	};
 
 	const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -85,23 +56,9 @@ export default function BuyApollo() {
 
 		setLoading(true);
 
-		// Basic validation checks
 		let isValid = true;
 
-		// if (!listName) {
-		// 	toast.error('Invalid Input', {
-		// 		description: 'Please enter a valid list name.',
-		// 	});
-		// 	isValid = false;
-		// }
 
-	
-		// if (!apolloURL || !/^https:\/\/app\.apollo\.io(\/.*)?$/.test(apolloURL.trim())) {
-		// 	toast.error('Invalid Apollo URL', {
-		// 		description: 'Please enter the correct Apollo URL starting with: https://app.apollo.io/',
-		// 	});
-		// 	isValid = false;
-		// }
 		
 
 		if (!leadCount || leadCount < 100 || leadCount > 1000000) {
@@ -179,16 +136,7 @@ export default function BuyApollo() {
 				<div className='mx-auto h-[70%] mt-10 flex max-w-sm items-center justify-center overflow-auto'>
 					<form className='flex flex-col gap-4' method='POST'>
 						<section className='flex flex-col gap-2'>
-							{/* <div>
-								<Label>What would you like to name your list?</Label>
-								<Input
-									type='text'
-									value={listName}
-									name='List Name'
-									onChange={handleListNameChange}
-									className={cn({ 'border-destructive': isListNameInvalid })}
-								/>
-							</div> */}
+					
 
 							<div>
 								<Label>Your Apollo Search URL</Label>
@@ -241,39 +189,16 @@ export default function BuyApollo() {
 									/>
 								</div>
 
-								{/* <div className='flex flex-row items-center justify-between'>
-									<Label>Get extra columns like SEO Description, Industry, Employee Count, etc.</Label>
-									<Switch
-										onCheckedChange={() => setExtraColumns((prev) => !prev)} // Handle switch toggle
-									/>
-								</div>
-
-								<div className='flex flex-row items-center justify-between'>
-									<Label>Send leads to my inbox</Label>
-									<Switch
-										checked={leadsToInbox}
-										onCheckedChange={() => setleadsToInbox(!leadsToInbox)} // Handle switch toggle
-									/>
-								</div> */}
-
-								{/* <div className='flex flex-row gap-5'>
-							<Switch
-								checked={addLeadsToCampaign}
-								onCheckedChange={() => setaddLeadsToCampaign(!addLeadsToCampaign)} // Handle switch toggle
-							/>
-							<label>Add leads directly to my campaign</label>
-						</div> */}
+					
 							</section>
 						</div>
 
-						{/* Dynamic Pricing Box */}
-						{/* <div className='h-11 w-auto rounded-lg bg-black p-2 px-8 text-lg font-semibold text-white'>
-							<p>Price: ${price}</p>
-						</div> */}
+					
 
-						<Button className='mt-2' onClick={handleSubmit}>
+						<RainbowButton className='mt-2' onClick={handleSubmit}>
 							Pay and Scrape
-						</Button>
+						</RainbowButton>
+						
 					</form>
 				</div>
 			)}

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { headers } from 'next/headers';
-import { runApifyClient } from './runApifyClient';
+// import { runApifyClient } from './runApifyClient';
 
-import { scrapeAndExportToCsv } from '@/components/utils/dataset-formatter/apify-formatter/route';
+// import { scrapeAndExportToCsv } from '@/components/utils/dataset-formatter/apify-formatter/route';
 import { sendEmail } from '@/components/utils/emailNotificationService/route';
 
 export async function POST(req: NextRequest) {
@@ -23,36 +23,42 @@ export async function POST(req: NextRequest) {
 
 	switch (event.type) {
 		case 'checkout.session.completed': {
-
 			console.log('Payment successful!');
 			const session = event.data.object;
-			const emailType = 'dataset';
-
-			try{
-				const dataset= await runApifyClient(session);
-				const formatedDataset = await scrapeAndExportToCsv(dataset); 
-				const options = {csv: formatedDataset, recepientEmail: session.customer_email};
-				await sendEmail(emailType, options);
-			}
-			catch(error){
-				console.error('Error running Apify client:', error);
-
-				//Attempt refund
-				try {
-                    const refund = await stripe.refunds.create({
-                        payment_intent: session.payment_intent as string,
-                        reason: 'requested_by_customer',
-                    });
-                    console.log('Refund issued:', refund.id);
-                } catch (refundError) {
-                    console.error('Error issuing refund:', refundError);
-                }
-
-                return new NextResponse('Apify client error; refund issued.', { status: 500 });
-			}
-
+			console.log('Session Data:', session);
+			// const emailType = 'dataset';
+			const sessionId = session.id;
+			console.log('Session ID:', sessionId);
+			// try {
+			//   console.log('Running Apify client...');
+			//   const dataset = await runApifyClient(session);
+		  
+			//   console.log('Formatting dataset...');
+			//   const formattedDataset = await scrapeAndExportToCsv(dataset);
+		  
+			//   console.log('Sending email...');
+			//   const options = { csv: formattedDataset, recepientEmail: session.customer_email };
+			//   await sendEmail(emailType, options);
+		  
+			//   console.log('Email sent successfully!');
+			// } catch (error) {
+			//   console.error('Error during checkout.session.completed:', error);
+		  
+			//   try {
+			// 	const refund = await stripe.refunds.create({
+			// 	  payment_intent: session.payment_intent as string,
+			// 	  reason: 'requested_by_customer',
+			// 	});
+			// 	console.log('Refund issued:', refund.id);
+			//   } catch (refundError) {
+			// 	console.error('Error issuing refund:', refundError);
+			//   }
+		  
+			//   return new NextResponse('Apify client error; refund issued.', { status: 500 });
+			// }
 			break;
-		}
+		  }
+		  
 
 		case 'invoice.payment_succeeded':
 			// Handle successful subscription payment
