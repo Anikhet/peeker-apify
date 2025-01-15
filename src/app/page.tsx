@@ -72,7 +72,7 @@ const Auth = () => {
   return (
 
     
-    <div className="flex min-h-screen items-center justify-center">
+    <div className="flex  items-center justify-center">
        <AnimatedGridPattern
         numSquares={200}
         maxOpacity={0.1}
