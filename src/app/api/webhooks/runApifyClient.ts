@@ -7,9 +7,6 @@ export async function runApifyClient(session: Stripe.Checkout.Session) {
 
         const client = new ApifyClient({
             token: process.env.ANIKHET_APIFY_KEY,
-            maxRetries: 8,
-            minDelayBetweenRetriesMillis: 500, // 0.5s
-            timeoutSecs: 360 // 6 mins
         });
 
         const lineItems = await stripe.checkout.sessions.retrieve(session.id, { expand: ['line_items'] });
