@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
 					totalRecords: data.formData.leadCount,
 					getPersonalEmails: data.formData.personalEmails,
 					getWorkEmails: data.formData.workEmails,
+					listName: data.formData.listName, // Include listName here
 				}
 			  },
 			  unit_amount: Math.round(data.formData.leadCount * 0.005 * 100), // Calculate total price in cents

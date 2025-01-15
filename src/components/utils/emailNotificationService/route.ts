@@ -28,7 +28,7 @@ type EmailOptions = DatasetOptions | RefundOptions;
 type EmailType = 'dataset' | 'refund';
 
 // Send email with the CSV attachment
-export async function sendEmail(type: EmailType, options: EmailOptions): Promise<void> {
+export async function sendEmail(type: EmailType, options: EmailOptions, listName : string): Promise<void> {
   try {
     let msg: MailDataRequired;
 
@@ -59,7 +59,7 @@ export async function sendEmail(type: EmailType, options: EmailOptions): Promise
           attachments: [
             {
               content: fileContent,
-              filename: 'dataset.csv',
+              filename: listName+'.csv',
               type: 'text/csv',
               disposition: 'attachment',
             },

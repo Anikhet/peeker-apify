@@ -28,7 +28,7 @@ export function AnimatedGridPattern({
   className,
   maxOpacity = 0.5,
   duration = 4,
-  // repeatDelay = 0.5,
+  repeatDelay = 0.5,
   ...props
 }: AnimatedGridPatternProps) {
   const id = useId();
@@ -74,25 +74,28 @@ export function AnimatedGridPattern({
 
   // Resize observer to update container dimensions
   useEffect(() => {
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setDimensions({
-          width: entry.contentRect.width,
-          height: entry.contentRect.height,
-        });
-      }
-    });
-
-    if (containerRef.current) {
-      resizeObserver.observe(containerRef.current);
-    }
-
-    return () => {
+    if (typeof window !== 'undefined') {
+      const resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          setDimensions({
+            width: entry.contentRect.width,
+            height: entry.contentRect.height,
+          });
+        }
+      });
+  
       if (containerRef.current) {
-        resizeObserver.unobserve(containerRef.current);
+        resizeObserver.observe(containerRef.current);
       }
-    };
+  
+      return () => {
+        if (containerRef.current) {
+          resizeObserver.unobserve(containerRef.current);
+        }
+      };
+    }
   }, [containerRef]);
+  
 
   return (
     <svg
@@ -128,6 +131,7 @@ export function AnimatedGridPattern({
             animate={{ opacity: maxOpacity }}
             transition={{
               duration,
+              repeatDelay,
               repeat: 1,
               delay: index * 0.1,
               repeatType: "reverse",

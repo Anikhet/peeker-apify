@@ -62,7 +62,7 @@ export default function PaymentSuccessPageComponent() {
       <p className="text-xl mb-4">Sit back and relax while we process your payment details.</p>
       <p className="text-lg text-gray-600 mb-8">Session ID: {session_id}</p>
       <button
-        onClick={() => router.push('/')}
+        onClick={() => router.push('/dashboard')}
         className="px-6 py-3 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition"
       >
         Go to Homepage

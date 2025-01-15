@@ -6,7 +6,8 @@ import PaymentSuccessPageComponent from '@/components/payment-page';
 export default function PaymentSuccessPage() {
 
 
-return (<Suspense fallback><PaymentSuccessPageComponent/>
+return (<Suspense >
+    <PaymentSuccessPageComponent/>
 
 
 </Suspense>)

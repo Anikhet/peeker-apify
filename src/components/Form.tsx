@@ -3,7 +3,7 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Switch } from '@/components/ui/switch';
-import { Button } from '@/components/ui/button';
+// import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Info } from 'lucide-react';
@@ -20,14 +20,15 @@ export default function BuyApollo() {
 	const [personalEmails, setPersonalEmails] = useState<boolean>(false);
 	const [workEmails, setWorkEmails] = useState<boolean>(false);
 
-	const [apolloURL, setApolloURL] = useState<string>();
-	const [leadCount, setLeadCount] = useState<number>();
+	const [apolloURL, setApolloURL] = useState<string>(""); // Controlled input
+	const [leadCount, setLeadCount] = useState<number>(0);  // Controlled input
+	const [listName, setListName] = useState<string>(""); // New state for List Name
 
 	const [isApolloURLInvalid, setIsApolloURLInvalid] = useState(false);
 	const [isLeadCountInvalid, setIsLeadCountInvalid] = useState(false);
+	const [isListNameInvalid, setIsListNameInvalid] = useState(false); // New validation state
 
 	const [price, setPrice] = useState(0);
-
 
 	const handleLeadCountChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const value = parseInt(e.target.value);
@@ -43,9 +44,16 @@ export default function BuyApollo() {
 		}
 	};
 
+	// Handle List Name change
+	const handleListNameChange = (e: ChangeEvent<HTMLInputElement>) => {
+		setListName(e.target.value);
+		if (e.target.value.trim() === "") {
+			setIsListNameInvalid(true);
+		} else {
+			setIsListNameInvalid(false);
+		}
+	};
 
-
-	// Real-time validation for Apollo URL
 	const handleURLChange = (e: ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setApolloURL(value);
@@ -58,18 +66,21 @@ export default function BuyApollo() {
 
 		let isValid = true;
 
+		if (!listName.trim()) {
+			setIsListNameInvalid(true);
+			toast.error('Invalid List Name', {
+				description: 'List name cannot be empty.',
+			});
+			isValid = false;
+		}
 
-		
-
-		if (!leadCount || leadCount < 100 || leadCount > 1000000) {
+		if (!leadCount || leadCount < 100 || leadCount > 50000) {
 			setIsLeadCountInvalid(true);
 			toast.error('Invalid Lead Count', {
 				description: 'Lead count must be between 100 and 1,000,000.',
 			});
 			isValid = false;
 		}
-
-	
 
 		if (!isValid) return; // Stop if validation fails
 
@@ -79,20 +90,22 @@ export default function BuyApollo() {
 			toast.error('We cannot proceed');
 			return;
 		}
+		const adjustedLeadCount = leadCount < 500 ? 500 : leadCount;
 
 		// Payload for list processing
 		const formData = {
 			apolloURL,
-			leadCount,
+			leadCount : adjustedLeadCount,
+			listName, // Include the new field
 			personalEmails,
-			workEmails
+			workEmails,
 		};
 
 		const payload = {
 			formData,
-			//returnUrl: window.location.href,
-			returnUrl: 'http://localhost:3000/',
-		};
+			returnUrl: process.env.NEXT_PUBLIC_RETURN_URL || 'http://localhost:3000/', // Fallback for local development
+		  };
+		  
 
 		console.log("return url "+window.location.href);
 
@@ -112,10 +125,9 @@ export default function BuyApollo() {
 
 		setLoading(false);
 	};
+
 	const searchParams = useSearchParams();
 	useEffect(() => {
-		// Check if we have a success paramter in the URL
-		
 		const session = searchParams.get('session');
 		if (session) {
 			setIsSuccess(true);
@@ -136,8 +148,6 @@ export default function BuyApollo() {
 				<div className='mx-auto h-[70%] mt-10 flex max-w-sm items-center justify-center overflow-auto'>
 					<form className='flex flex-col gap-4' method='POST'>
 						<section className='flex flex-col gap-2'>
-					
-
 							<div>
 								<Label>Your Apollo Search URL</Label>
 								<Input
@@ -150,13 +160,24 @@ export default function BuyApollo() {
 							</div>
 
 							<div>
-								<Label>Number of contacts (100 min - 100K max)</Label>
+								<Label>Number of contacts (100 min - 50K max)</Label>
 								<Input
 									type='number'
 									name='Lead count'
-									value={leadCount}
+									value={leadCount || ""}
 									onChange={handleLeadCountChange}
 									className={cn({ 'border-destructive': isLeadCountInvalid })}
+								/>
+							</div>
+
+							<div>
+								<Label>List Name</Label>
+								<Input
+									type='text'
+									value={listName}
+									name='List Name'
+									onChange={handleListNameChange}
+									className={cn({ 'border-destructive': isListNameInvalid })}
 								/>
 							</div>
 						</section>
@@ -177,35 +198,25 @@ export default function BuyApollo() {
 								<div className='flex flex-row items-center justify-between'>
 									<Label>Get Work Emails</Label>
 									<Switch
-										// Reflect the current visibility of the column
-										onCheckedChange={() => setWorkEmails((prev) => !prev)} // Handle switch toggle
+										onCheckedChange={() => setWorkEmails((prev) => !prev)}
 									/>
 								</div>
 
 								<div className='flex flex-row items-center justify-between'>
 									<Label>Get Personal Emails</Label>
 									<Switch
-										onCheckedChange={() => setPersonalEmails((prev) => !prev)} // Handle switch toggle
+										onCheckedChange={() => setPersonalEmails((prev) => !prev)}
 									/>
 								</div>
-
-					
 							</section>
 						</div>
-
-					
 
 						<RainbowButton className='mt-2' onClick={handleSubmit}>
 							Pay and Scrape
 						</RainbowButton>
-						
 					</form>
 				</div>
 			)}
 		</div>
 	);
 }
-
-
-
-

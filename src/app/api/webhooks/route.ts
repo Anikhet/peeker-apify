@@ -6,12 +6,14 @@ import { runApifyClient } from './runApifyClient';
 import { scrapeAndExportToCsv } from '@/components/utils/dataset-formatter/apify-formatter/route';
 import { sendEmail } from '@/components/utils/emailNotificationService/route';
 
+
 export async function POST(req: NextRequest) {
 	const payload = await req.text();
 
 	const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2024-12-18.acacia' });
 	const apikey = process.env.STRIPE_WEBHOOK_SECRET;
-	const signature = headers().get('stripe-signature') as string;
+	const headersList = await headers();
+	const signature = headersList.get('stripe-signature') as string;
 	let event: Stripe.Event;
 
 	try {
@@ -29,6 +31,10 @@ export async function POST(req: NextRequest) {
 			const emailType = 'dataset';
 			const sessionId = session.id;
 			console.log('Session ID:', sessionId);
+			const metadata = session.metadata;
+			const listName = metadata?.listName; // Retrieve listName
+		  
+			
 			try {
 			  console.log('Running Apify client...');
 			  const dataset = await runApifyClient(session);
@@ -38,7 +44,7 @@ export async function POST(req: NextRequest) {
 		  
 			  console.log('Sending email...');
 			  const options = { csv: formattedDataset, recepientEmail: session.customer_email };
-			  await sendEmail(emailType, options);
+			  await sendEmail(emailType, options, listName || 'defaultListName');
 		  
 			  console.log('Email sent successfully!');
 			} catch (error) {
@@ -71,8 +77,12 @@ export async function POST(req: NextRequest) {
 			const emailType = 'refund';
 
 			try{
+
+	
+				const metadata = refund.metadata;
+				const listName = metadata?.listName; // Retrieve listName
 				const options = {refundDetails: { ...refund, status: refund.status ?? 'unknown' }};
-				sendEmail(emailType, options);
+				sendEmail(emailType, options,listName || 'defaultListName');
 			}
 			catch (refundEmailError){
 				console.error('Error sending refund email', refundEmailError);
