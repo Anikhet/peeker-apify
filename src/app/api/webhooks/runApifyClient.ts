@@ -1,5 +1,6 @@
 import { ApifyClient } from "apify-client";
 import Stripe from "stripe";
+import { createClient } from "@supabase/supabase-js";
 
 // import { scrapeAndExportToCsv, sendEmail } from './your-utils'; // <--- If you have these utilities
 
@@ -17,6 +18,12 @@ export async function runApifyClient(session: Stripe.Checkout.Session) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: "2024-12-18.acacia",
   });
+
+  // Initialize Supabase client
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_SUPABASE_SERVICE_ROLE_KEY!
+  );
 
   const lineItems = await stripe.checkout.sessions.retrieve(session.id, {
     expand: ["line_items"],
@@ -41,6 +48,30 @@ export async function runApifyClient(session: Stripe.Checkout.Session) {
   }
 
   try {
+    // Create order record in Supabase
+    const { data: order, error: orderError } = await supabase
+      .from('orders')
+      .insert({
+        session_id: sessionId,
+        email: session.customer_details?.email,
+        list_name: product.name,
+        executed: false,
+        created_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+
+    if (orderError) {
+      console.error('Failed to create order:', orderError);
+      throw new Error('Failed to create order in database');
+    }
+
+    console.log('Order created successfully:', {
+      orderId: order.id,
+      sessionId,
+      email: order.email
+    });
+
     // ------------------------------------------------------------------------------
     // If you intended to scrape data with an Actor and then use that data,
     // you could do so AFTER the Actor run finishes, or via the webhook callback.
