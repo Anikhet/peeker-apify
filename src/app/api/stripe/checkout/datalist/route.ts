@@ -7,6 +7,7 @@ import { NextResponse, NextRequest } from 'next/server';
 export async function POST(req: NextRequest) {
 	const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
+
 	try {
 		// if (!user) throw new Error('User not found');
 		
