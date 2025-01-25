@@ -5,14 +5,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { headers } from 'next/headers';
 import { runApifyClient } from './runApifyClient';
-import { scrapeAndExportToCsv } from '@/components/utils/dataset-formatter/apify-formatter/route';
 import { sendEmail } from '@/components/utils/emailNotificationService/route';
 
 export async function POST(req: NextRequest) {
 	const payload = await req.text();
+	const headersList = await headers();
+	
+	// Handle Stripe webhook
 	const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2024-12-18.acacia' });
 	const apikey = process.env.STRIPE_WEBHOOK_SECRET;
-	const headersList = await headers();
 	const signature = headersList.get('stripe-signature') as string;
 	let event: Stripe.Event;
 	try {
@@ -26,64 +27,59 @@ export async function POST(req: NextRequest) {
 			console.log('Payment successful!');
 			const session = event.data.object;
 			console.log('Session Data:', session);
-			const emailType = 'dataset';
-			const sessionId = session.id;
-			console.log('Session ID:', sessionId);
-			const metadata = session.metadata;
-			const listName = metadata?.listName; // Retrieve listName
-		  
 			
 			try {
-			  console.log('Running Apify client...');
-			  const dataset = await runApifyClient(session);
-		  
-			  console.log('Formatting dataset...');
-			  const formattedDataset = await scrapeAndExportToCsv(dataset);
-		  
-			  console.log('Sending email...');
-			  const options = { csv: formattedDataset, recepientEmail: session.customer_email };
-			  await sendEmail(emailType, options, listName || 'defaultListName');
-		  
-			  console.log('Email sent successfully!');
-			} catch (error) {
-			  console.error('Error during checkout.session.completed:', error);
-		  
-			  try {
-				const refund = await stripe.refunds.create({
-				  payment_intent: session.payment_intent as string,
-				  reason: 'requested_by_customer',
+				console.log('Starting Apify client with session:', {
+					sessionId: session.id,
+					paymentStatus: session.payment_status,
+					timestamp: new Date().toISOString()
 				});
-				console.log('Refund issued:', refund.id);
-			  } catch (refundError) {
-				console.error('Error issuing refund:', refundError);
-			  }
-		  
-			  return new NextResponse('Apify client error; refund issued.', { status: 500 });
-			}
-			break;
-		  }
-		  
-		case 'invoice.payment_succeeded':
-			// Handle successful subscription payment
-			break;
-		
-		case 'refund.created': {
-			console.log('Refund created');
-			const refund = event.data.object;
-			const emailType = 'refund';
-			try{
-	
-				const metadata = refund.metadata;
-				const listName = metadata?.listName; // Retrieve listName
-				const options = {refundDetails: { ...refund, status: refund.status ?? 'unknown' }};
-				sendEmail(emailType, options,listName || 'defaultListName');
-			}
-			catch (refundEmailError){
-				console.error('Error sending refund email', refundEmailError);
+				// Fire and forget - don't await
+				runApifyClient(session).then((runId) => {
+					console.log('Apify client started successfully:', {
+						runId,
+						sessionId: session.id,
+						timestamp: new Date().toISOString()
+					});
+				}).catch(async (error) => {
+					console.error('Error in Apify client:', error);
+					try {
+						const refund = await stripe.refunds.create({
+							payment_intent: session.payment_intent as string,
+							reason: 'requested_by_customer',
+						});
+						console.log('Refund issued:', refund.id);
+					} catch (refundError) {
+						console.error('Error issuing refund:', refundError);
+					}
+				});
+			} catch (error) {
+				console.error('Error initiating Apify client:', error);
+				return new NextResponse('Error initiating Apify client', { status: 500 });
 			}
 			break;
 		}
-		// Add more cases for other event types you want to handle
+		
+		case 'refund.created': {
+			const refund = event.data.object;
+			const metadata = refund.metadata;
+			const listName = metadata?.listName;
+			
+			console.log('Processing refund:', refund.id);
+			try {
+				await sendEmail('refund', {
+					refundDetails: { 
+						...refund, 
+						status: refund.status ?? 'unknown' 
+					}
+				}, listName || 'defaultListName');
+				console.log('Refund notification sent successfully');
+			} catch (error) {
+				console.error('Error sending refund notification:', error);
+			}
+			break;
+		}
+		
 		default:
 			console.log(`Unhandled event type: ${event.type}`);
 	}

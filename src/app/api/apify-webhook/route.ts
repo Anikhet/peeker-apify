@@ -13,6 +13,13 @@ export async function POST(req: NextRequest) {
         const payload = await req.json();
         console.log('Apify webhook payload:', JSON.stringify(payload, null, 2));
 
+        // Verify webhook token
+        const expectedToken = process.env.APIFY_WEBHOOK_TOKEN;
+        if (expectedToken && payload.token !== expectedToken) {
+            console.error('Invalid webhook token');
+            return new NextResponse('Unauthorized', { status: 401 });
+        }
+
         // Verify this is a successful run completion
         if (payload.eventType !== 'ACTOR.RUN.SUCCEEDED') {
             console.log('Ignoring non-success event:', payload.eventType);
@@ -20,6 +27,11 @@ export async function POST(req: NextRequest) {
         }
 
         const { actorRunId, datasetId, sessionId } = payload;
+        if (!sessionId) {
+            console.error('Missing sessionId in payload');
+            return new NextResponse('Missing sessionId', { status: 400 });
+        }
+
         console.log('Processing webhook for:', {
             actorRunId,
             datasetId,
@@ -30,7 +42,7 @@ export async function POST(req: NextRequest) {
         // Initialize Supabase
         const supabase = createClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.SUPABASE_SERVICE_ROLE_KEY!
+            process.env.NEXT_SUPABASE_SERVICE_ROLE_KEY!
         );
 
         // Get the pending order associated with this session
