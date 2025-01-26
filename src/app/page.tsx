@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 import { cn } from "@/lib/utils";
 import { AnimatedGridPattern } from "@/components/ui/animated-grid-pattern";
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 
 
 const HomePage = () => {
