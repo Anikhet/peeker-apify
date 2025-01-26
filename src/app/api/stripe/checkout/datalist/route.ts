@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
 			price_data: {
 			  currency: 'usd',
 			  product_data: {
-				name: 'Apollo lead list by Apollo Scraper',
+				name: data.formData.listName,
 				description: `Get ${data.formData.leadCount} scraped leads from apollo for your url ${data.formData.apolloURL}`,
 				metadata: {
 					totalRecords: data.formData.leadCount,
