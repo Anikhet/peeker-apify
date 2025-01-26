@@ -28,7 +28,7 @@ type EmailOptions = DatasetOptions | RefundOptions;
 type EmailType = 'dataset' | 'refund';
 
 // Send email with the CSV attachment
-export async function sendEmail(type: EmailType, options: EmailOptions, listName : string): Promise<void> {
+export async function sendEmail(type: EmailType, options: EmailOptions, listName : string, email?: string): Promise<void> {
   try {
     let msg: MailDataRequired;
 
@@ -51,7 +51,7 @@ export async function sendEmail(type: EmailType, options: EmailOptions, listName
         const fileContent = await fs.readFile(tempFilePath, { encoding: 'base64' });
 
         msg = {
-          to: 'animulky@gmail.com', // Replace with dynamic email
+          to: email, // Replace with dynamic email
           from: 'team@peeker.ai', // Change to your verified sender
           subject: 'Here is your dataset!',
           text: 'Please find the requested dataset attached. Download and enjoy!',

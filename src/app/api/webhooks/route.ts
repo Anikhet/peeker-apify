@@ -73,7 +73,9 @@ export async function POST(req: NextRequest) {
 				await sendEmail('refund', {
 					refundDetails: { 
 						...refund, 
-						status: refund.status ?? 'unknown' 
+						status: refund.status ?? 'unknown'
+						 
+						
 					}
 				}, listName || 'defaultListName');
 				console.log('Refund notification sent successfully');

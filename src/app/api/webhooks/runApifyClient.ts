@@ -75,7 +75,8 @@ export async function runApifyClient(session: Stripe.Checkout.Session) {
     });
 
     const apifyClient = new ApifyClient({
-      token: process.env.ANIKHET_APIFY_KEY
+      token: process.env.ANIKHET_APIFY_KEY,
+      timeoutSecs: 0,
     });
 
     const run = await apifyClient    
