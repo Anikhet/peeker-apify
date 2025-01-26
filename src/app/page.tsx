@@ -21,7 +21,7 @@ const HomePage = () => {
           "inset-x-0 inset-y-[-30%] h-[100%] skew-y-12"
         )}
       />
-      <div className="w-full max-w-md p-10 space-y-6">
+      <div className="w-full max-w-md p-10 space-y-6  flex flex-col items-center justify-center">
         <h1 className="text-3xl font-bold text-center text-gray-800">
           Apollo Scraper
         </h1>
