@@ -17,13 +17,19 @@ export async function POST(req: NextRequest) {
 
         // Extract data from Apify's standard payload format
         const eventType = payload.eventType;
-        const actorRunId = payload.resource?.actId;
+        const actorRunId = payload.eventData?.actorRunId;
         const data = payload.resource?.defaultDataset?.items;
 
         // Validate webhook event type
         if (eventType !== 'ACTOR.RUN.SUCCEEDED') {
             console.log('Ignoring non-success event:', eventType);
             return new NextResponse('Not a success event', { status: 200 });
+        }
+
+        // Validate data exists
+        if (!data) {
+            console.error('Dataset items is null or undefined');
+            return new NextResponse('No data in dataset', { status: 400 });
         }
 
         // Validate data structure
