@@ -89,11 +89,14 @@ export async function runApifyClient(session: Stripe.Checkout.Session) {
 
     console.log("Apify run started successfully:", run);
 
+
+
     // Update order with run ID
     await supabase
       .from('orders')
       .update({ 
         run_id: run.id,
+        dataset_id: run.defaultDatasetId
       })
       .eq('id', order.id);
 
