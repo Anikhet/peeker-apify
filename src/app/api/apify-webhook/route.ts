@@ -15,18 +15,21 @@ export async function POST(req: NextRequest) {
         const payload = await req.json();
         console.log('Full webhook payload:', JSON.stringify(payload, null, 2));
 
-        // Validate payload structure
-        if (!payload || typeof payload !== 'object') {
-            throw new Error('Invalid payload format');
-        }
+        // Extract data from Apify's standard payload format
+        const eventType = payload.eventType;
+        const actorRunId = payload.resource?.actId;
+        const data = payload.resource?.defaultDataset?.items;
 
-        const data = payload.data;
-        const actorRunId = payload.actorRunId;
+        // Validate webhook event type
+        if (eventType !== 'ACTOR.RUN.SUCCEEDED') {
+            console.log('Ignoring non-success event:', eventType);
+            return new NextResponse('Not a success event', { status: 200 });
+        }
 
         // Validate data structure
         if (!Array.isArray(data)) {
-            console.error('Data is not an array:', typeof data);
-            return new NextResponse('Data must be an array', { status: 400 });
+            console.error('Invalid data format:', typeof data);
+            return new NextResponse('Invalid data format', { status: 400 });
         }
 
         // Initialize Supabase with error handling
@@ -88,16 +91,18 @@ export async function POST(req: NextRequest) {
             // }, order.list_name);
             
             // Update order status
+            console.log('Attempting to update order status...');
             const { error: updateError } = await supabase
                 .from('orders')
                 .update({ 
                     executed: true,
-                    actor_run_id: actorRunId,
-                    completed_at: new Date().toISOString()
+                   run_id: actorRunId,
+                    // completed_at: new Date().toISOString()
                 })
                 .eq('id', order.id);
 
             if (updateError) {
+                console.error('Update error:', updateError);
                 throw updateError;
             }
 
@@ -105,11 +110,12 @@ export async function POST(req: NextRequest) {
             return new NextResponse('Success', { status: 200 });
         } catch (processError: Error | unknown) {
             console.error('Processing failed:', {
-                error: processError instanceof Error ? processError.message : 'Unknown error',
+                error: processError instanceof Error ? processError.message : processError,
+                stack: processError instanceof Error ? processError.stack : undefined,
                 orderId: order?.id
             });
             return new NextResponse(
-                `Processing failed: ${processError instanceof Error ? processError.message : 'Unknown error'}`, 
+                `Processing failed: ${processError instanceof Error ? processError.message : JSON.stringify(processError)}`, 
                 { status: 500 }
             );
         }
