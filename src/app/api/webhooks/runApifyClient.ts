@@ -87,6 +87,8 @@ export async function runApifyClient(session: Stripe.Checkout.Session) {
         getPersonalEmails: Boolean(product.metadata.getPersonalEmails)
       });
 
+    console.log("Apify run started successfully:", run);
+
   } catch (error) {
     console.error("Error in runApifyClient:", error);
     throw error;
