@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 	switch (event.type) {
 		case 'checkout.session.completed': {
 			console.log('Payment successful!');
-			const session = event.data.object;
+			const session = event.data.object as Stripe.Checkout.Session;
 			console.log('Session Data:', session);
 			
 			try {
@@ -34,8 +34,9 @@ export async function POST(req: NextRequest) {
 					paymentStatus: session.payment_status,
 					timestamp: new Date().toISOString()
 				});
-				// Fire and forget - don't await
-				runApifyClient(session).then((runId) => {
+				
+				// Wait for runApifyClient to complete instead of fire-and-forget
+				await runApifyClient(session).then((runId) => {
 					console.log('Apify client started successfully:', {
 						runId,
 						sessionId: session.id,
@@ -52,12 +53,14 @@ export async function POST(req: NextRequest) {
 					} catch (refundError) {
 						console.error('Error issuing refund:', refundError);
 					}
+					throw error; // Re-throw to trigger the outer catch block
 				});
+				
+				return new NextResponse('Ok', { status: 200 });
 			} catch (error) {
 				console.error('Error initiating Apify client:', error);
 				return new NextResponse('Error initiating Apify client', { status: 500 });
 			}
-			break;
 		}
 		
 		case 'refund.created': {
