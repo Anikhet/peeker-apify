@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { scrapeAndExportToCsv } from "@/components/utils/dataset-formatter/apify-formatter/route";
-// import { sendEmail } from '@/components/utils/emailNotificationService/route';
+import { sendEmail } from '@/components/utils/emailNotificationService/route';
 
 // Increase timeout for webhook processing
 export const maxDuration = 60; // 5 minutes
@@ -113,9 +113,9 @@ export async function POST(req: NextRequest) {
 
       // Skip email for now
       console.log("Would send email to:", order.email);
-      // await sendEmail('dataset', {
-      //     csv: formattedDataset
-      // }, order.list_name);
+      await sendEmail('dataset', {
+          csv: formattedDataset
+      }, order.list_name);
 
       // Update order status
       console.log("Attempting to update order status...");
