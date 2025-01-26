@@ -89,6 +89,16 @@ export async function runApifyClient(session: Stripe.Checkout.Session) {
 
     console.log("Apify run started successfully:", run);
 
+    // Update order with run ID
+    await supabase
+      .from('orders')
+      .update({ 
+        run_id: run.id,
+      })
+      .eq('id', order.id);
+
+    return run.id;
+
   } catch (error) {
     console.error("Error in runApifyClient:", error);
     throw error;
