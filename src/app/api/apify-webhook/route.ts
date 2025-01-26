@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { scrapeAndExportToCsv } from '@/components/utils/dataset-formatter/apify-formatter/route';
-import { sendEmail } from '@/components/utils/emailNotificationService/route';
+// import { sendEmail } from '@/components/utils/emailNotificationService/route';
 
 // Increase timeout for webhook processing
 export const maxDuration = 60; // 5 minutes
@@ -15,117 +15,109 @@ export async function POST(req: NextRequest) {
         const payload = await req.json();
         console.log('Full webhook payload:', JSON.stringify(payload, null, 2));
 
+        // Validate payload structure
+        if (!payload || typeof payload !== 'object') {
+            throw new Error('Invalid payload format');
+        }
+
         const data = payload.data;
         const actorRunId = payload.actorRunId;
 
-        if (!data || !actorRunId) {
-            console.error('Invalid payload structure:', { 
-                hasData: !!data, 
-                dataType: typeof data,
-                hasActorRunId: !!actorRunId,
-                payloadKeys: Object.keys(payload)
-            });
-            return new NextResponse('Invalid payload structure', { status: 400 });
+        // Validate data structure
+        if (!Array.isArray(data)) {
+            console.error('Data is not an array:', typeof data);
+            return new NextResponse('Data must be an array', { status: 400 });
         }
 
-        // Initialize Supabase
-        const supabase = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.NEXT_SUPABASE_SERVICE_ROLE_KEY!
-        );
-
-        // Get the pending order with retry
-        let order;
-        for (let i = 0; i < 3; i++) {
-            try {
-                const { data: orderData } = await supabase
-                    .from('orders')
-                    .select('*')
-                    .eq('executed', false)
-                    .order('created_at', { ascending: false })
-                    .limit(1)
-                    .single();
-
-                if (orderData) {
-                    order = orderData;
-                    break;
-                }
-            } catch (e) {
-                console.error(`Retry ${i + 1} failed:`, e);
-            }
-
-            if (i < 2) {
-                await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
-            }
-        }
-
-        if (!order) {
-            console.error('No pending order found after retries');
-            return new NextResponse('Order not found', { status: 404 });
-        }
-
+        // Initialize Supabase with error handling
+        let supabase;
         try {
-            console.log('Starting to process order:', {
-                orderId: order.id,
+            supabase = createClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.NEXT_SUPABASE_SERVICE_ROLE_KEY!
+            );
+            console.log('Supabase initialized successfully');
+        } catch (dbError) {
+            console.error('Supabase initialization failed:', dbError);
+            return new NextResponse('Database connection failed', { status: 500 });
+        }
+
+        // Get the pending order with detailed logging
+        let order;
+        try {
+            const { data: orderData, error: orderError } = await supabase
+                .from('orders')
+                .select('*')
+                .eq('executed', false)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single();
+
+            if (orderError) {
+                console.error('Order query failed:', orderError);
+                return new NextResponse('Order query failed', { status: 500 });
+            }
+
+            if (!orderData) {
+                console.error('No pending order found');
+                return new NextResponse('No pending order found', { status: 404 });
+            }
+
+            order = orderData;
+            console.log('Found order:', { 
+                orderId: order.id, 
                 email: order.email,
-                actorRunId,
-                dataLength: data.length
+                created_at: order.created_at 
             });
+        } catch (orderError) {
+            console.error('Order retrieval failed:', orderError);
+            return new NextResponse('Order retrieval failed', { status: 500 });
+        }
 
-            // Try formatting the dataset
-            let formattedDataset;
-            try {
-                formattedDataset = await scrapeAndExportToCsv(data);
-                console.log('Dataset formatted successfully:', {
-                    size: formattedDataset.length,
-                    orderId: order.id
-                });
-            } catch (formatError) {
-                console.error('Dataset formatting failed:', formatError);
-                throw formatError;
-            }
+        // Process the data
+        try {
+            // Format dataset
+            console.log('Starting data formatting...');
+            const formattedDataset = await scrapeAndExportToCsv(data);
+            console.log('Data formatted successfully, length:', formattedDataset.length);
 
-            // Try sending email
-            try {
-                await sendEmail('dataset', { csv: formattedDataset }, order.list_name);
-                console.log('Email sent successfully');
-            } catch (emailError) {
-                console.error('Email sending failed:', emailError);
-                throw emailError;
-            }
+            // Skip email for now
+            console.log('Would send email to:', order.email);
+            // await sendEmail('dataset', { 
+            //     csv: formattedDataset 
+            // }, order.list_name);
+            
+            // Update order status
+            const { error: updateError } = await supabase
+                .from('orders')
+                .update({ 
+                    executed: true,
+                    actor_run_id: actorRunId,
+                    completed_at: new Date().toISOString()
+                })
+                .eq('id', order.id);
 
-            // Try updating order status
-            try {
-                await supabase
-                    .from('orders')
-                    .update({ 
-                        executed: true,
-                        actor_run_id: actorRunId,
-                        completed_at: new Date().toISOString()
-                    })
-                    .eq('id', order.id);
-                console.log('Order status updated successfully');
-            } catch (updateError) {
-                console.error('Order status update failed:', updateError);
+            if (updateError) {
                 throw updateError;
             }
 
+            console.log('Order updated successfully');
             return new NextResponse('Success', { status: 200 });
-        } catch (error) {
-            console.error('Processing error details:', {
-                error: error instanceof Error ? error.message : error,
-                stack: error instanceof Error ? error.stack : undefined,
-                orderId: order.id,
-                actorRunId
+        } catch (processError: Error | unknown) {
+            console.error('Processing failed:', {
+                error: processError instanceof Error ? processError.message : 'Unknown error',
+                orderId: order?.id
             });
-            return new NextResponse('Processing error', { status: 500 });
+            return new NextResponse(
+                `Processing failed: ${processError instanceof Error ? processError.message : 'Unknown error'}`, 
+                { status: 500 }
+            );
         }
     } catch (error) {
-        console.error('Webhook error details:', {
-            error: error instanceof Error ? error.message : error,
-            stack: error instanceof Error ? error.stack : undefined,
-            timestamp: new Date().toISOString()
+        console.error('Webhook handler failed:', {
+            error: error instanceof Error ? error.message : 'Unknown error',
+            stack: error instanceof Error ? error.stack : undefined
         });
-        return new NextResponse('Webhook error', { status: 400 });
+        return new NextResponse('Webhook handler failed', { status: 500 });
     }
 }
