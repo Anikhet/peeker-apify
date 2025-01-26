@@ -13,17 +13,18 @@ export async function POST(req: NextRequest) {
 
     try {
         const payload = await req.json();
-        console.log('Webhook payload:', {
-            actorRunId: payload.actorRunId,
-            dataLength: payload.data?.length,
-            timestamp: new Date().toISOString()
-        });
+        console.log('Full webhook payload:', JSON.stringify(payload, null, 2));
 
         const data = payload.data;
         const actorRunId = payload.actorRunId;
 
         if (!data || !actorRunId) {
-            console.error('Invalid payload structure:', { data: !!data, actorRunId: !!actorRunId });
+            console.error('Invalid payload structure:', { 
+                hasData: !!data, 
+                dataType: typeof data,
+                hasActorRunId: !!actorRunId,
+                payloadKeys: Object.keys(payload)
+            });
             return new NextResponse('Invalid payload structure', { status: 400 });
         }
 
@@ -36,17 +37,21 @@ export async function POST(req: NextRequest) {
         // Get the pending order with retry
         let order;
         for (let i = 0; i < 3; i++) {
-            const { data: orderData } = await supabase
-                .from('orders')
-                .select('*')
-                .eq('executed', false)
-                .order('created_at', { ascending: false })
-                .limit(1)
-                .single();
+            try {
+                const { data: orderData } = await supabase
+                    .from('orders')
+                    .select('*')
+                    .eq('executed', false)
+                    .order('created_at', { ascending: false })
+                    .limit(1)
+                    .single();
 
-            if (orderData) {
-                order = orderData;
-                break;
+                if (orderData) {
+                    order = orderData;
+                    break;
+                }
+            } catch (e) {
+                console.error(`Retry ${i + 1} failed:`, e);
             }
 
             if (i < 2) {
@@ -60,49 +65,65 @@ export async function POST(req: NextRequest) {
         }
 
         try {
-            console.log('Processing order:', {
+            console.log('Starting to process order:', {
                 orderId: order.id,
                 email: order.email,
-                actorRunId
-            });
-
-            const formattedDataset = await scrapeAndExportToCsv(data);
-            console.log('Dataset formatted:', {
-                size: formattedDataset.length,
-                orderId: order.id
-            });
-
-            await sendEmail('dataset', {
-                csv: formattedDataset
-            }, order.list_name);
-
-            await supabase
-                .from('orders')
-                .update({ 
-                    executed: true,
-                    actor_run_id: actorRunId,
-                    completed_at: new Date().toISOString()
-                })
-                .eq('id', order.id);
-
-            console.log('Order completed successfully:', {
-                orderId: order.id,
                 actorRunId,
-                duration: `${Date.now() - new Date(startTime).getTime()}ms`
+                dataLength: data.length
             });
+
+            // Try formatting the dataset
+            let formattedDataset;
+            try {
+                formattedDataset = await scrapeAndExportToCsv(data);
+                console.log('Dataset formatted successfully:', {
+                    size: formattedDataset.length,
+                    orderId: order.id
+                });
+            } catch (formatError) {
+                console.error('Dataset formatting failed:', formatError);
+                throw formatError;
+            }
+
+            // Try sending email
+            try {
+                await sendEmail('dataset', { csv: formattedDataset }, order.list_name);
+                console.log('Email sent successfully');
+            } catch (emailError) {
+                console.error('Email sending failed:', emailError);
+                throw emailError;
+            }
+
+            // Try updating order status
+            try {
+                await supabase
+                    .from('orders')
+                    .update({ 
+                        executed: true,
+                        actor_run_id: actorRunId,
+                        completed_at: new Date().toISOString()
+                    })
+                    .eq('id', order.id);
+                console.log('Order status updated successfully');
+            } catch (updateError) {
+                console.error('Order status update failed:', updateError);
+                throw updateError;
+            }
 
             return new NextResponse('Success', { status: 200 });
         } catch (error) {
-            console.error('Processing error:', {
-                error,
+            console.error('Processing error details:', {
+                error: error instanceof Error ? error.message : error,
+                stack: error instanceof Error ? error.stack : undefined,
                 orderId: order.id,
                 actorRunId
             });
             return new NextResponse('Processing error', { status: 500 });
         }
     } catch (error) {
-        console.error('Webhook error:', {
-            error,
+        console.error('Webhook error details:', {
+            error: error instanceof Error ? error.message : error,
+            stack: error instanceof Error ? error.stack : undefined,
             timestamp: new Date().toISOString()
         });
         return new NextResponse('Webhook error', { status: 400 });
