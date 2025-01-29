@@ -19,9 +19,9 @@ async function fetchSeoDescription(url: string, retries = 3): Promise<string> {
 
       const $ = cheerio.load(response.data);
       return $('meta[name="description"]').attr("content") || "No description available";
-    } catch (error: any) {
+    } catch (error) {
       console.error(
-        `⚠️ [Attempt ${attempt + 1} of ${retries}] Failed to fetch SEO for ${url} - ${error.message}`
+        `⚠️ [Attempt ${attempt + 1} of ${retries}] Failed to fetch SEO for ${url} - ${error}`
       );
 
       // Wait 3s before the next retry

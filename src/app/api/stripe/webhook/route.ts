@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
 	const headersList = await headers();
 	
 	// Handle Stripe webhook
-	const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2024-12-18.acacia' });
+	const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-01-27.acacia' });
 	const apikey = process.env.STRIPE_WEBHOOK_SECRET;
 	const signature = headersList.get('stripe-signature') as string;
 	let event: Stripe.Event;
