@@ -31,14 +31,20 @@ export async function POST(req: NextRequest) {
 			},
 		};
 
+		
+		
+
 		const session = await stripe.checkout.sessions.create({
 			payment_method_types: ['card'],
 			line_items: [lineItemsData],
 			mode: 'payment',
 			success_url: `${data.returnUrl}/payment-session/success?session_id={CHECKOUT_SESSION_ID}`,
 			cancel_url: `${data.returnUrl}/payment-session/failure`,
+			//  2kD0SHev
+			 allow_promotion_codes:true
 		  });
-		  
+
+		 
 		console.log('Success URL:', `${data.returnUrl}/payment-session/success?session_id={CHECKOUT_SESSION_ID}`);
 		console.log('Cancel URL:', `${data.returnUrl}/payment-session/failure`);
 
