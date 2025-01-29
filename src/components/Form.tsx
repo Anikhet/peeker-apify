@@ -15,7 +15,6 @@ import { RainbowButton } from "./ui/rainbow-button";
 
 export default function BuyApollo() {
   const [, setLoading] = useState<boolean>(false);
-  const [isSuccess, setIsSuccess] = useState(false);
 
   const [personalEmails, setPersonalEmails] = useState<boolean>(false);
   const [workEmails, setWorkEmails] = useState<boolean>(false);
@@ -134,7 +133,7 @@ export default function BuyApollo() {
     console.log("return url " + window.location.href);
 
     // Calling backend API to create a checkout session
-    const response = await fetch("/api/stripe/checkout/datalist", {
+    const response = await fetch("/api/stripe/checkout/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -152,13 +151,7 @@ export default function BuyApollo() {
     setLoading(false);
   };
 
-  const searchParams = useSearchParams();
-  useEffect(() => {
-    const session = searchParams.get("session");
-    if (session) {
-      setIsSuccess(true);
-    }
-  }, [searchParams]);
+
 
   return (
     <div className="w-full">
@@ -170,9 +163,6 @@ export default function BuyApollo() {
         </div>
       </div>
 
-      {isSuccess ? (
-        <div className="mx-auto mt-10 flex max-w-sm items-center justify-center "></div>
-      ) : (
         <div className="mx-auto h-[70%] mt-10 flex max-w-sm items-center justify-center ">
           <form className="flex flex-col gap-4" method="POST">
             <section className="flex flex-col gap-2">
@@ -251,7 +241,7 @@ export default function BuyApollo() {
             </RainbowButton>
           </form>
         </div>
-      )}
+   
     </div>
   );
 }
