@@ -22,8 +22,8 @@ async function fetchSeoDescription(url: string, retries = 2): Promise<string> {
 
       console.log(`🔍 [SEO Found] ${url} → "${seoDescription}"`);
       return seoDescription;
-    } catch (error: any) {
-      console.error(`⚠️ [Attempt ${attempt + 1}] SEO Fetch Failed for ${url}: ${error.message}`);
+    } catch (error) {
+      console.error(`⚠️ [Attempt ${attempt + 1}] SEO Fetch Failed for ${url}: ${error}`);
 
       if (attempt < retries - 1) {
         console.log(`🔄 Retrying in 3s...`);
