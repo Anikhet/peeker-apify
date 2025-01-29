@@ -5,7 +5,7 @@ import { AsyncParser } from "@json2csv/node";
 // ---------------------------------------
 // 1) Helper Function to Fetch SEO Description
 // ---------------------------------------
-async function fetchSeoDescription(url: string, retries = 3): Promise<string> {
+async function fetchSeoDescription(url: string, retries = 2): Promise<string> {
   for (let attempt = 0; attempt < retries; attempt++) {
     try {
       const response = await axios.get(url, {
@@ -18,20 +18,23 @@ async function fetchSeoDescription(url: string, retries = 3): Promise<string> {
       });
 
       const $ = cheerio.load(response.data);
-      return $('meta[name="description"]').attr("content") || "No description available";
-    } catch (error) {
-      console.error(
-        `⚠️ [Attempt ${attempt + 1} of ${retries}] Failed to fetch SEO for ${url} - ${error}`
-      );
+      const seoDescription = $('meta[name="description"]').attr("content") || "No description available";
 
-      // Wait 3s before the next retry
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+      console.log(`🔍 [SEO Found] ${url} → "${seoDescription}"`);
+      return seoDescription;
+    } catch (error: any) {
+      console.error(`⚠️ [Attempt ${attempt + 1}] SEO Fetch Failed for ${url}: ${error.message}`);
+
+      if (attempt < retries - 1) {
+        console.log(`🔄 Retrying in 3s...`);
+        await new Promise((resolve) => setTimeout(resolve, 3000)); // Retry delay
+      }
     }
   }
 
-  // If all retries fail, return a fallback
-  return "Error fetching description";
+  return "Error fetching description"; // Final fallback
 }
+
 
 // ---------------------------------------
 // 2) Type Definitions
@@ -77,43 +80,44 @@ export interface DatasetItem {
 // 3) Batching & Processing Function
 // ---------------------------------------
 async function processDataset(dataset: DatasetItem[], batchSize = 200) {
+  console.log(`🚀 Processing dataset with ${dataset.length} rows...`);
+
   for (let i = 0; i < dataset.length; i += batchSize) {
     const batch = dataset.slice(i, i + batchSize);
 
-    // Fetch SEO descriptions in parallel for items in this batch
+    console.log(`🔄 Processing batch ${i / batchSize + 1} / ${Math.ceil(dataset.length / batchSize)}`);
+
     await Promise.all(
       batch.map(async (item) => {
         if (item.organization?.website_url) {
-          item.organization.seo_description = await fetchSeoDescription(
-            item.organization.website_url
-          );
+          item.organization.seo_description = await fetchSeoDescription(item.organization.website_url);
         } else {
-          // If no website URL, just store a default message
           item.organization = {
             ...item.organization,
             seo_description: "No website available",
           };
         }
-        return item;
       })
     );
 
     console.log(`✅ Processed ${Math.min(i + batchSize, dataset.length)} / ${dataset.length} rows`);
-
-    // 200ms delay before processing the next batch to avoid rate limits
-    await new Promise((res) => setTimeout(res, 200));
+    await new Promise((res) => setTimeout(res, 200)); // 200ms delay
   }
+
+  // 🚀 Debugging: Log first few items after processing
+  console.log("📊 Sample Processed Data:", JSON.stringify(dataset.slice(0, 5), null, 2));
 }
+
 
 // ---------------------------------------
 // 4) Main Function to Export CSV
 // ---------------------------------------
 export async function scrapeAndExportToCsv(dataset: DatasetItem[]) {
   try {
-    // 1) Process the dataset to populate SEO descriptions
-    await processDataset(dataset, 200); // Use batchSize = 200 for large volumes
+    await processDataset(dataset, 200); // Process dataset
 
-    // 2) Define CSV fields
+    console.log("📊 Sample Data Before CSV Export:", JSON.stringify(dataset.slice(0, 5), null, 2));
+
     const fields = [
       "First Name",
       "Last Name",
@@ -127,28 +131,48 @@ export async function scrapeAndExportToCsv(dataset: DatasetItem[]) {
       "Lead State",
       "Lead Country",
       "Company Name",
-      "Cleaned Company Name",
-      "Company Website Full",
-      "Company Website Short",
-      "Company Twitter Link",
-      "Company Facebook Link",
-      "Company LinkedIn Link",
-      "Company Phone Number",
+      "Company Website",
+      "Company Twitter",
+      "Company LinkedIn",
+      "Company Phone",
       "Company Market Cap",
       "Company SEO Description",
       "Company Founded Year",
     ];
 
-    // 3) Convert the final dataset to CSV
-    //    We assume you've populated dataset with correct keys for each field
+    // 🔹 Explicitly map dataset to CSV format
+    const formattedData = dataset.map((item) => ({
+      "First Name": item.first_name || "",
+      "Last Name": item.last_name || "",
+      "Full Name": item.name || "",
+      "Title": item.title || "",
+      "Headline": item.headline || "",
+      "Email": item.email || "",
+      "Email Status": item.email_status || "",
+      "LinkedIn Link": item.linkedin_url || "",
+      "Lead City": item.city || "",
+      "Lead State": item.state || "",
+      "Lead Country": item.country || "",
+      "Company Name": item.organization?.name || "",
+      "Company Website": item.organization?.website_url || "",
+      "Company Twitter": item.organization?.twitter_url || "",
+      "Company LinkedIn": item.organization?.linkedin_url || "",
+      "Company Phone": item.organization?.primary_phone?.sanitized_number || "",
+      "Company Market Cap": item.organization?.market_cap || "",
+      "Company SEO Description": item.organization?.seo_description || "",  // 🔹 Ensure this is included
+      "Company Founded Year": item.organization?.founded_year || "",
+    }));
+
     const opts = { fields };
     const parser = new AsyncParser(opts);
-    const csv = await parser.parse(dataset).promise();
+    const csv = await parser.parse(formattedData).promise();
 
-    console.log("✅ CSV data prepared successfully.");
+    console.log("✅ CSV Data Generated Successfully!");
     return csv;
   } catch (error) {
     console.error("❌ Error during scraping or exporting:", error);
     throw error;
   }
 }
+
+
