@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { scrapeAndExportToCsv } from "@/components/utils/dataset-formatter/apify-formatter/route";
-import { sendEmail } from '@/components/utils/emailNotificationService/route';
+
+import { sendEmail } from '@/components/utils/emailNotificationService/emailNotif';
+import { scrapeAndExportToCsv } from "@/components/utils/dataset-formatter/exportCsv";
+// import { scrapeAndExportToCsv } from '@/components/utils/dataset-formatter/exportCsv';
 
 // Increase timeout for webhook processing
 export const maxDuration = 60; 

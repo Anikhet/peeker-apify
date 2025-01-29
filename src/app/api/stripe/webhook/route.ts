@@ -4,8 +4,9 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { headers } from 'next/headers';
-import { runApifyClient } from './runApifyClient';
-import { sendEmail } from '@/components/utils/emailNotificationService/route';
+
+import { sendEmail } from '@/components/utils/emailNotificationService/emailNotif';
+import { runApifyClient } from '@/components/utils/ApifyClient/runApifyClient';
 
 export async function POST(req: NextRequest) {
 	const payload = await req.text();

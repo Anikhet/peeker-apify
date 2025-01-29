@@ -19,6 +19,7 @@ export default function BuyApollo() {
 
   const [personalEmails, setPersonalEmails] = useState<boolean>(false);
   const [workEmails, setWorkEmails] = useState<boolean>(false);
+  const [seo, setSeo] = useState<boolean>(false);
 
   const [apolloURL, setApolloURL] = useState<string>(""); // Controlled input
   const [leadCount, setLeadCount] = useState<number>(0); // Controlled input
@@ -121,6 +122,7 @@ export default function BuyApollo() {
       listName,
       personalEmails,
       workEmails,
+      seo,
     };
 
     const payload = {
@@ -162,16 +164,16 @@ export default function BuyApollo() {
     <div className="w-full">
       <div className="w-full border-b py-4">
         <div className="mx-auto max-w-sm">
-          <h1 className="pointer-events-none mx-auto text-4xl font-bold">
+          <h1 className="pointer-events-none mx-auto text-center text-4xl font-bold">
             Apollo Scraper
           </h1>
         </div>
       </div>
 
       {isSuccess ? (
-        <div className="mx-auto mt-10 flex max-w-sm items-center justify-center overflow-auto"></div>
+        <div className="mx-auto mt-10 flex max-w-sm items-center justify-center "></div>
       ) : (
-        <div className="mx-auto h-[70%] mt-10 flex max-w-sm items-center justify-center overflow-auto">
+        <div className="mx-auto h-[70%] mt-10 flex max-w-sm items-center justify-center ">
           <form className="flex flex-col gap-4" method="POST">
             <section className="flex flex-col gap-2">
               <div>
@@ -186,7 +188,7 @@ export default function BuyApollo() {
               </div>
 
               <div>
-                <Label>Number of contacts (100 min - 50K max)</Label>
+                <Label>Number of Contacts (100 min - 50K max)</Label>
                 <Input
                   type="number"
                   name="Lead count"
@@ -216,9 +218,8 @@ export default function BuyApollo() {
                     <Info className="size-4" /> Good to know
                   </span>
                   <Label className="text-muted-foreground">
-                    Set the Apollo link to only scrape leads with emails
-                    available. Ignore if you&apos;ve already set email status
-                    filter in Apollo
+                    Set the Apollo link to only scrape leads with verified emails
+                    available to save money
                   </Label>
                 </div>
 
@@ -235,11 +236,18 @@ export default function BuyApollo() {
                     onCheckedChange={() => setPersonalEmails((prev) => !prev)}
                   />
                 </div>
+
+                <div className="flex flex-row items-center justify-between">
+                  <Label>Get Seo Description</Label>
+                  <Switch
+                    onCheckedChange={() =>setSeo((prev) => !prev)}
+                  />
+                </div>
               </section>
             </div>
 
             <RainbowButton className="mt-2" onClick={handleSubmit}>
-              Pay and Scrape
+            {leadCount ? `Buy for $${(leadCount * 0.005)}` : "Pay and Scrape"}
             </RainbowButton>
           </form>
         </div>

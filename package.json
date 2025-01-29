@@ -18,8 +18,11 @@
     "@stripe/stripe-js": "^5.5.0",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.47.13",
+    "@trigger.dev/sdk": "^3.3.12",
+    "@types/cheerio": "^0.22.35",
     "apify-client": "^2.11.1",
     "axios": "^1.7.9",
+    "cheerio": "^1.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^11.18.0",
@@ -35,6 +38,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@trigger.dev/build": "^3.3.12",
     "@types/json2csv": "^5.0.7",
     "@types/next": "^9.0.0",
     "@types/node": "^22.10.6",
