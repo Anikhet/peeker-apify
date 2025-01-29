@@ -133,7 +133,7 @@ export default function BuyApollo() {
     console.log("return url " + window.location.href);
 
     // Calling backend API to create a checkout session
-    const response = await fetch("/api/stripe/checkout/", {
+    const response = await fetch("/api/stripe/checkout-session/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),

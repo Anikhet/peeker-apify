@@ -26,7 +26,7 @@ export default function PaymentSuccessPageComponent() {
 
     const fetchSessionDetails = async () => {
       try {
-        const response = await fetch(`/api/stripe/payment-sessions?session_id=${session_id}`);
+        const response = await fetch(`/api/stripe/payment-session?session_id=${session_id}`);
         if (!response.ok) throw new Error('Failed to fetch session details');
         const data = await response.json();
         setSessionDetails(data);
