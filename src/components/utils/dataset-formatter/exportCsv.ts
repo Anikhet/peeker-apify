@@ -1,12 +1,13 @@
 import axios from "axios";
 import * as cheerio from 'cheerio';
-import { parse } from "json2csv";
+// import { parse } from "json2csv";
+import { AsyncParser } from '@json2csv/node';
 // Example JSONB input
 // const dataset = require('./dataset2.json');
 // Fetch SEO description of the company website
 async function fetchSeoDescription(url: string) {
   try {
-    const response = await axios.get(url, { timeout: 50000 });
+    const response = await axios.get(url, { timeout: 10000 });
     const $ = cheerio.load(response.data);
     const metaDescription = $('meta[name="description"]').attr("content");
     return metaDescription || "No description available";
@@ -140,7 +141,14 @@ export async function scrapeAndExportToCsv(dataset: DatasetItem[]) {
     );
 
     // Convert mapped items to CSV
-    const csv = parse(mappedItems, { fields });
+    const opts = {fields};
+const transformOpts = {};
+const asyncOpts = {};
+const parser = new AsyncParser(opts, asyncOpts, transformOpts );
+
+const csv = await parser.parse(mappedItems).promise();
+
+    // const csv = parse(mappedItems, { fields });
 
     console.log("CSV data prepared successfully.");
 
