@@ -75,7 +75,7 @@ export default function PaymentSuccessPageComponent() {
       <p className="text-lg text-gray-600 mb-8">⁠You will receive your order within 12 hours      </p>
       <p className='text-muted-foreground flex gap-2 items-center justify-center'><Info/> On average, your list will be delivered to your email within 4 hours.</p>
       <button
-        onClick={() => router.push('/apollo')}
+        onClick={() => router.push('/')}
         className="px-6 py-3 mt-8 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition"
       >
         Go to Homepage
