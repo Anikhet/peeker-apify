@@ -137,12 +137,11 @@ export default function BuyApollo() {
       personalEmails,
       workEmails,
       seo,
-      referralId, // ✅ Pass referral ID to backend
+      referralId: referralId || "",
     };
     console.log("Form Data:", formData);
 
     const payload = {
-      referralId,
       formData,
       returnUrl: process.env.NEXT_PUBLIC_URL 
       // returnUrl :"http://localhost:3000/"
