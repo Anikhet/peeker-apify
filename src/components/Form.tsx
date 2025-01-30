@@ -35,10 +35,10 @@ export default function BuyApollo() {
 
   useEffect(() => {
     // Extract 'ref' parameter from the URL
-    const ref = searchParams.get("via");
-    console.log("via", ref);
-    if (ref) {
-      setReferralId(ref);
+    const via = searchParams.get("via");
+    console.log("via", via);
+    if (via) {
+      setReferralId(via);
     }
   }, [searchParams]);
   const handleLeadCountChange = (e: ChangeEvent<HTMLInputElement>) => {
