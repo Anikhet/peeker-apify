@@ -43,6 +43,10 @@ export async function POST(req: NextRequest) {
 						description: `Get ${data.formData.leadCount} scraped leads from apollo for your url ${data.formData.apolloURL}`,
 						metadata: {
 							totalRecords: data.formData.leadCount,
+							getPersonalEmails: data.formData.personalEmails,
+							getWorkEmails: data.formData.workEmails,
+							listName: data.formData.listName,
+
 						}
 					},
 					unit_amount: Math.round(data.formData.leadCount * 0.5),
