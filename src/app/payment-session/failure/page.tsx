@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Info } from "lucide-react";
+// import { Info } from "lucide-react";
 // import { createClient } from '@supabase/supabase-js';
 
 export default function PaymentSuccessPageComponent() {
