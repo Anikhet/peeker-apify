@@ -139,6 +139,7 @@ export default function BuyApollo() {
       seo,
       referralId, // ✅ Pass referral ID to backend
     };
+    console.log("Form Data:", formData);
 
     const payload = {
       formData,
