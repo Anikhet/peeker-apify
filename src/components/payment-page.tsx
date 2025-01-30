@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Info } from "lucide-react";
-import { createClient } from '@supabase/supabase-js';
+// import { createClient } from '@supabase/supabase-js';
 
 export default function PaymentSuccessPageComponent() {
   const searchParams = useSearchParams();
@@ -22,15 +22,10 @@ export default function PaymentSuccessPageComponent() {
     // Add other fields as necessary
   }
 
-  interface Order {
-    id: string;
-    session_id: string;
-    price: number;
-    // Add other fields as necessary
-  }
+
 
   const [sessionDetails, setSessionDetails] = useState<SessionDetails | null>(null);
-  const [order, setOrder] = useState<Order | null>(null);
+  // const [_, setOrder] = useState<Order | null>(null);
 
   useEffect(() => {
     if (!session_id) {
@@ -40,22 +35,7 @@ export default function PaymentSuccessPageComponent() {
 
     const fetchSessionDetails = async () => {
 
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
-    
-      const { data: orderData, error: orderError } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('session_id', session_id)
-        .single();
 
-      if (orderError) {
-        console.error('Error fetching order:', orderError);
-      } else {
-        setOrder(orderData);
-      }
 
       try {
         const response = await fetch(`/api/stripe/payment-session?session_id=${session_id}`);
