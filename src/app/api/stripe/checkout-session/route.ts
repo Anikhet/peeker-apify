@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
 			customer_creation: 'always', // Required for Rewardful
 			client_reference_id: data.formData.referralId, // Pass referral ID to Rewardful
 			metadata: {
-				ref: data.formData.referralId // Correct way to pass referral ID to Rewardful
+				referral: data.formData.referralId // Correct way to pass referral ID to Rewardful
 			}
 			
 		});
