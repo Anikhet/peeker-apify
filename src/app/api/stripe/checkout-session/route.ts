@@ -13,36 +13,51 @@ export async function POST(req: NextRequest) {
 		
 		const data = await req.json();
 
-		const lineItemsData = {
-			quantity: 1, // Always set quantity to 1 because we'll dynamically calculate the price
-			price_data: {
-			  currency: 'usd',
-			  product_data: {
-				name: data.formData.listName,
-				description: `Get ${data.formData.leadCount} scraped leads from apollo for your url ${data.formData.apolloURL}`,
-				metadata: {
-					totalRecords: data.formData.leadCount,
-					getPersonalEmails: data.formData.personalEmails,
-					getWorkEmails: data.formData.workEmails,
-					listName: data.formData.listName, // Include listName here
-				}
-			  },
-			  unit_amount: Math.round(data.formData.leadCount * 0.005 * 100), // Calculate total price in cents
-			},
-		};
+		// const lineItemsData = {
+		// 	quantity: 1, // Always set quantity to 1 because we'll dynamically calculate the price
+		// 	price_data: {
+		// 	  currency: 'usd',
+		// 	  product_data: {
+		// 		name: data.formData.listName,
+		// 		description: `Get ${data.formData.leadCount} scraped leads from apollo for your url ${data.formData.apolloURL}`,
+		// 		metadata: {
+		// 			totalRecords: data.formData.leadCount,
+		// 			getPersonalEmails: data.formData.personalEmails,
+		// 			getWorkEmails: data.formData.workEmails,
+		// 			listName: data.formData.listName, // Include listName here
+		// 		}
+		// 	  },
+		// 	  unit_amount: Math.round(data.formData.leadCount * 0.005 * 100), // Calculate total price in cents
+		// 	},
+		// };
 
 		
 		
 
 		const session = await stripe.checkout.sessions.create({
-			payment_method_types: ['card'],
-			line_items: [lineItemsData],
+			line_items: [{
+				price_data: {
+					currency: 'usd',
+					product_data: {
+						name: data.formData.listName,
+						description: `Get ${data.formData.leadCount} scraped leads from apollo for your url ${data.formData.apolloURL}`,
+						metadata: {
+							totalRecords: data.formData.leadCount,
+						}
+					},
+					unit_amount: Math.round(data.formData.leadCount * 0.5),
+				},
+				quantity: 1,
+			}],
 			mode: 'payment',
 			success_url: `${data.returnUrl}/payment-session/success?session_id={CHECKOUT_SESSION_ID}`,
 			cancel_url: `${data.returnUrl}/payment-session/failure`,
-			//  2kD0SHev
-			 allow_promotion_codes:true
-		  });
+			allow_promotion_codes: true,
+			customer_creation: 'always', // Required for Rewardful
+			metadata: {
+				ref: data.referralId // Correct way to pass referral ID to Rewardful
+			}
+		});
 
 		 
 		console.log('Success URL:', `${data.returnUrl}/payment-session/success?session_id={CHECKOUT_SESSION_ID}`);
@@ -56,4 +71,3 @@ export async function POST(req: NextRequest) {
 		return NextResponse.json({ error: 'Failed to create session' }, { status: 500 });
 	}
 }
-

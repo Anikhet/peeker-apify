@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 // import { useSearchParams } from "next/navigation";
 import { RainbowButton } from "./ui/rainbow-button";
+import { useSearchParams } from "next/navigation";
 
 export default function BuyApollo() {
   const [, setLoading] = useState<boolean>(false);
@@ -29,7 +30,16 @@ export default function BuyApollo() {
   const [isListNameInvalid, setIsListNameInvalid] = useState(false); // New validation state
 
   const [price, setPrice] = useState(0);
+  const [referralId, setReferralId] = useState<string | null>(null);
+  const searchParams = useSearchParams();
 
+  useEffect(() => {
+    // Extract 'ref' parameter from the URL
+    const ref = searchParams.get("ref");
+    if (ref) {
+      setReferralId(ref);
+    }
+  }, [searchParams]);
   const handleLeadCountChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
     setLeadCount(value);
@@ -123,12 +133,13 @@ export default function BuyApollo() {
       personalEmails,
       workEmails,
       seo,
+      referralId, // ✅ Pass referral ID to backend
     };
 
     const payload = {
       formData,
-      returnUrl: process.env.NEXT_PUBLIC_URL 
-      // returnUrl :"http://localhost:3000/"
+      // returnUrl: process.env.NEXT_PUBLIC_URL 
+      returnUrl :"http://localhost:3000/"
     };
 
     console.log("return url " + window.location.href);

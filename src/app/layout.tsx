@@ -33,8 +33,8 @@ export default function RootLayout({
         <Toaster position="top-right" richColors closeButton />
         {children}
         <SpeedInsights />
-      </body>
-      <Script
+
+        <Script
         id="crisp-chat-int"
         type="text/javascript"
         strategy="afterInteractive"
@@ -45,6 +45,14 @@ window.$crisp=[];window.CRISP_WEBSITE_ID="f7f2e649-789a-4bc8-bcf5-af7b02be6ae0";
 s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();`,
         }}
       />
+       <Script src="https://r.wdfl.co/rw.js" data-rewardful="80669a"></Script>
+        <Script id="rewardful-queue" strategy="beforeInteractive">
+          {`(function(w,r){w._rwq=r;w[r]=w[r]||function(){(w[r].q=w[r].q||[]).push(arguments)}})(window,'rewardful');`}
+        </Script>
+      </body>
+  
+  
     </html>
+    
   );
 }

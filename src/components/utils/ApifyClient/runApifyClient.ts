@@ -59,7 +59,9 @@ export async function runApifyClient(session: Stripe.Checkout.Session) {
         list_name: product.name,
         executed: false,
         created_at: new Date().toISOString(),
-        records: product.metadata.totalRecords
+        records: product.metadata.totalRecords,
+        url: product.description,
+        price: lineItems.line_items?.data[0]?.amount_total || 0
       })
       .select()
       .single();
