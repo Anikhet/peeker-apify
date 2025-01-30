@@ -36,6 +36,7 @@ export default function BuyApollo() {
   useEffect(() => {
     // Extract 'ref' parameter from the URL
     const ref = searchParams.get("ref");
+    console.log("ref", ref);
     if (ref) {
       setReferralId(ref);
     }

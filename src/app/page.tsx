@@ -1,14 +1,20 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 import { cn } from "@/lib/utils";
 import { AnimatedGridPattern } from "@/components/ui/animated-grid-pattern";
+import { use, useEffect } from "react";
 // import Image from "next/image";
 
 // import { Button } from "@/components/ui/button";
 
 const HomePage = () => {
   const router = useRouter();
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    console.log(searchParams)
+  }, [searchParams])
   
   return (
     <div className="flex min-h-screen items-center justify-center flex-col gap-1">
@@ -39,7 +45,13 @@ const HomePage = () => {
             className=" w-20 h-20 "
           /> */}
         </section>
-        <RainbowButton onClick={() => router.push('/apollo')}>Start Scraping</RainbowButton>
+        <RainbowButton onClick={() => 
+        {
+          const paramsString = searchParams.toString(); // Convert params to string
+          router.push(paramsString ? `/apollo?${paramsString}` : "/apollo")
+        }
+      
+      }>Start Scraping</RainbowButton>
       </div>
     </div>
   );

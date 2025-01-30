@@ -29,7 +29,8 @@ export async function runApifyClient(session: Stripe.Checkout.Session) {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_SUPABASE_SERVICE_ROLE_KEY!
   );
-
+  const paymentIntent = await stripe.paymentIntents.retrieve(session.id)
+  console.log("Payment Intent:", paymentIntent);
   const lineItems = await stripe.checkout.sessions.retrieve(session.id, {
     expand: ["line_items"],
   });
