@@ -80,7 +80,7 @@ export async function runApifyClient(session: Stripe.Checkout.Session) {
     });
 
     const run = await apifyClient    
-      .actor('jljBwyyQakqrL1wae')
+      .task("GWKway1i5CFDcfgy3")
       .start({ 
         url: product.description,
         totalRecords: parseInt(product.metadata.totalRecords),

@@ -53,7 +53,7 @@ export async function sendEmail(type: EmailType, options: EmailOptions, listName
         msg = {
           to: email, // Replace with dynamic email
           from: 'team@peeker.ai', // Change to your verified sender
-          subject: 'Here is your dataset!',
+          subject: 'Here is your Apollo Scraped '+listName,
           text: 'Please find the requested dataset attached. Download and enjoy!',
           html: '<strong>Powered by Peeker.ai</strong>',
           attachments: [

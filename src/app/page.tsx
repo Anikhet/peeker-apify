@@ -3,14 +3,15 @@ import { useRouter } from "next/navigation";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 import { cn } from "@/lib/utils";
 import { AnimatedGridPattern } from "@/components/ui/animated-grid-pattern";
-import Image from "next/image";
+// import Image from "next/image";
+
 // import { Button } from "@/components/ui/button";
 
 const HomePage = () => {
   const router = useRouter();
   
   return (
-    <div className="flex min-h-screen items-center justify-center">
+    <div className="flex min-h-screen items-center justify-center flex-col gap-1">
       <AnimatedGridPattern
         numSquares={200}
         maxOpacity={0.1}
@@ -21,17 +22,23 @@ const HomePage = () => {
           "inset-x-0 inset-y-[-30%] h-[100%] skew-y-12"
         )}
       />
-      <div className="w-full max-w-md p-10 space-y-10 flex flex-col items-center justify-center">
-        <h1 className="text-4xl font-bold text-center text-gray-800 flex items-center justify-center tracking-tight">
-          Apollo Scraper
-          <Image
+              <h2 className="text-base font-medium px-4 py-2 mr-6  text-center flex items-center justify-center tracking-tight rounded-full bg-gradient-to-r from-indigo-500/5 to-blue-500/5 border border-indigo-200 hover:border-indigo-300 transition-all duration-300 hover:scale-105 text-gray-600 shadow-sm hover:shadow-indigo-100">Usage Based Pricing</h2>
+      <div className="w-full max-w-7xl p-10 gap-10   flex flex-col items-center justify-center mb-20">
+
+        <section className="flex flex-row items-center  justify-center">
+        <h1 className="text-7xl font-bold text-center text-gray-800  tracking-tight">
+          Apollo Scraper 🚀
+          
+        </h1>
+        
+        {/* <Image
             width={100}
             height={100}
             src="/fire.gif"
             alt="Fire"
-            className=" w-12 h-12"
-          />
-        </h1>
+            className=" w-20 h-20 "
+          /> */}
+        </section>
         <RainbowButton onClick={() => router.push('/apollo')}>Start Scraping</RainbowButton>
       </div>
     </div>

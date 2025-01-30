@@ -10,7 +10,7 @@ import { Info } from "lucide-react";
 
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { useSearchParams } from "next/navigation";
+// import { useSearchParams } from "next/navigation";
 import { RainbowButton } from "./ui/rainbow-button";
 
 export default function BuyApollo() {
@@ -80,11 +80,12 @@ export default function BuyApollo() {
       setIsListNameInvalid(false); // Reset invalid state if valid
     }
 
-    // Validate Apollo URL
-    if (!apolloURL.trim()) {
+    const apolloURLPattern = /^https:\/\/app\.apollo\.io\/#/;
+
+    if (!apolloURL.trim() || !apolloURLPattern.test(apolloURL)) {
       setIsApolloURLInvalid(true);
       toast.error("Invalid Apollo URL", {
-        description: "Apollo URL cannot be empty.",
+        description: "Apollo URL must start with 'https://app.apollo.io/#'.",
       });
       isValid = false;
     }
@@ -189,7 +190,7 @@ export default function BuyApollo() {
               </div>
 
               <div>
-                <Label>List Name</Label>
+                <Label>Name Your List</Label>
                 <Input
                   type="text"
                   value={listName}
@@ -205,11 +206,10 @@ export default function BuyApollo() {
               <section className="flex flex-col gap-4">
                 <div className="mt-2 rounded-md bg-muted p-2">
                   <span className="flex items-center gap-2 text-muted-foreground">
-                    <Info className="size-4" /> Good to know
+                    <Info className="size-4" /> Suggestion
                   </span>
                   <Label className="text-muted-foreground">
-                    Set the Apollo link to only scrape leads with verified emails
-                    available to save money
+                  Set your Apollo &apos;Email Status&apos; filter to only contain &apos;Verified&apos; emails
                   </Label>
                 </div>
 
@@ -228,7 +228,7 @@ export default function BuyApollo() {
                 </div>
 
                 <div className="flex flex-row items-center justify-between">
-                  <Label>Get Seo Description</Label>
+                  <Label>Get SEO Description</Label>
                   <Switch
                     onCheckedChange={() =>setSeo((prev) => !prev)}
                   />
@@ -237,7 +237,7 @@ export default function BuyApollo() {
             </div>
 
             <RainbowButton className="mt-2" onClick={handleSubmit}>
-            {leadCount ? `Buy for $${(leadCount * 0.005)}` : "Pay and Scrape"}
+            {leadCount ? `Scrape for $${(leadCount * 0.005).toFixed(2)}` : "Scrape"}
             </RainbowButton>
           </form>
         </div>

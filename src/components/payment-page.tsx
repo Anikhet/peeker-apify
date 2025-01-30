@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { Info } from "lucide-react";
 
 export default function PaymentSuccessPageComponent() {
   const searchParams = useSearchParams();
@@ -58,9 +59,10 @@ export default function PaymentSuccessPageComponent() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 text-center">
-      <h1 className="text-4xl font-bold mb-6 text-green-600">🎉 Payment Successful!</h1>
-      <p className="text-xl mb-4">Sit back and relax while we process your payment details.</p>
-      <p className="text-lg text-gray-600 mb-8">Session ID: {session_id}</p>
+      <h1 className="text-4xl font-bold mb-6 text-green-600">🎉 Thank you for ordering!</h1>
+      <p className="text-xl mb-4">You just ordered your lead list for $${sessionDetails.amount / 100} for LINK </p>
+      <p className="text-lg text-gray-600 mb-8">⁠You will receive your order within 12 hours      </p>
+      <p className='text-muted-foreground'><Info/> On average, your list will be delivered to your email within 4 hours.</p>
       <button
         onClick={() => router.push('/apollo')}
         className="px-6 py-3 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition"
