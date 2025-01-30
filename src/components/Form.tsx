@@ -14,6 +14,16 @@ import { cn } from "@/lib/utils";
 import { RainbowButton } from "./ui/rainbow-button";
 import { useSearchParams } from "next/navigation";
 
+// Add TypeScript declarations for Rewardful
+declare global {
+  interface Window {
+    rewardful: (event: string, callback: () => void) => void;
+    Rewardful: {
+      referral: string | null;
+    };
+  }
+}
+
 export default function BuyApollo() {
   const [, setLoading] = useState<boolean>(false);
 
@@ -31,18 +41,17 @@ export default function BuyApollo() {
 
   const [price, setPrice] = useState(0);
   const searchParams = useSearchParams();
-  const [referralId, setReferralId] = useState<string | null>(null);
+  const [referral, setReferral] = useState<string | null>(null)
 
   useEffect(() => {
-    // Wait for hydration before extracting params
-    setTimeout(() => {
-      const ref = searchParams.get("via"); // Get 'via' parameter
-      console.log("Extracted via after delay:", ref);
-      if (ref) {
-        setReferralId(ref);
-      }
-    }, 500); // 500ms delay ensures hydration
-  }, [searchParams]); // Runs whenever searchParams updates
+    if (typeof window !== 'undefined' && window.rewardful) {
+      window.rewardful('ready', function() {
+        if (window.Rewardful && window.Rewardful.referral) {
+          setReferral(window.Rewardful.referral);
+        }
+      });
+    }
+  }, []);
   
   const handleLeadCountChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
@@ -137,7 +146,8 @@ export default function BuyApollo() {
       personalEmails,
       workEmails,
       seo,
-      referralId: referralId || "",
+      referral
+ 
     };
     console.log("Form Data:", formData);
 
@@ -251,6 +261,7 @@ export default function BuyApollo() {
                 </div>
               </section>
             </div>
+            { referral ? <input type="hidden" name="referral" value={referral} /> : null }
 
             <RainbowButton className="mt-2" onClick={handleSubmit}>
             {leadCount ? `Scrape for $${(leadCount * 0.005).toFixed(2)}` : "Scrape"}

@@ -55,17 +55,17 @@ export async function POST(req: NextRequest) {
       cancel_url: `${data.returnUrl}/payment-session/failure`,
       allow_promotion_codes: true,
       customer_creation: "always",
-      ...(data.formData.referralId && {
-        client_reference_id: data.formData.referralId,
+      ...(data.formData.referral && {
+        client_reference_id: data.formData.referral,
       }),
-      ...(data.formData.referralId && {
+      ...(data.formData.referral && {
         metadata: {
-          referral: data.formData.referralId,
+          referral: data.formData.referral,
         },
       }),
     });
 
-    console.log("Referral ID:", data.formData.referralId);
+    console.log("Referral ID:", data.formData.referral);
     console.log(
       "Success URL:",
       `${data.returnUrl}/payment-session/success?session_id={CHECKOUT_SESSION_ID}`
