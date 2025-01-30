@@ -3,7 +3,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 import { cn } from "@/lib/utils";
 import { AnimatedGridPattern } from "@/components/ui/animated-grid-pattern";
-import { use, useEffect } from "react";
+import {  useEffect } from "react";
 // import Image from "next/image";
 
 // import { Button } from "@/components/ui/button";
