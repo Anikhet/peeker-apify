@@ -11,7 +11,7 @@ interface DataFormatterPayload {
 
 export const dataFormatterTask = task({
   id: "data-formatter",
-  maxDuration: 3600, // 5 minutes
+  maxDuration: 3600, // 60 minutes
   machine: "medium-2x",
   run: async (payload: unknown) => {
     try {

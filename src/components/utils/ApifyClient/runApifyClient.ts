@@ -5,8 +5,6 @@ import { ApifyClient } from 'apify-client';
 
 export async function runApifyClient(session: Stripe.Checkout.Session) {
   console.log("Payment successful!");
-  // console.log("Full Session Data:", JSON.stringify(session, null, 2));
-
 
   const sessionId = session.id;
   const customerEmail = session.customer_details?.email;
@@ -16,8 +14,6 @@ export async function runApifyClient(session: Stripe.Checkout.Session) {
     customerEmail,
     timestamp: new Date().toISOString()
   });
-
-
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: "2025-01-27.acacia",
@@ -51,30 +47,6 @@ export async function runApifyClient(session: Stripe.Checkout.Session) {
       list_name: product.name
     });
 
-    const { data: order } = await supabase
-      .from('orders')
-      .insert({
-        session_id: sessionId,
-        email: customerEmail,
-        list_name: product.name,
-        executed: false,
-        created_at: new Date().toISOString(),
-        records: product.metadata.totalRecords,
-        url: product.description,
-        price: lineItems.line_items?.data[0]?.amount_total || 0
-      })
-      .select()
-      .single();
-
-    if (!order) {
-      throw new Error("Failed to create order");
-    }
-
-    console.log('Order created successfully:', {
-      orderId: order?.id,
-      sessionId,
-      email: order?.email
-    });
 
     const apifyClient = new ApifyClient({
       token: process.env.ANIKHET_APIFY_KEY,
@@ -95,15 +67,37 @@ export async function runApifyClient(session: Stripe.Checkout.Session) {
 
 
     // Update order with run ID
-    await supabase
-      .from('orders')
-      .update({ 
-        run_id: run.id,
-        dataset_id: run.defaultDatasetId
-      })
-      .eq('id', order.id);
 
-    return run.id;
+    const { data: order } = await supabase
+    .from('orders')
+    .insert({
+      session_id: sessionId,
+      email: customerEmail,
+      list_name: product.name,
+      executed: false,
+      created_at: new Date().toISOString(),
+      records: product.metadata.totalRecords,
+      url: product.description,
+      price: lineItems.line_items?.data[0]?.amount_total || 0,
+      run_id: run.id,
+      dataset_id: run.defaultDatasetId
+    })
+    .select()
+    .single();
+
+  if (!order) {
+    throw new Error("Failed to create order");
+  }
+
+  console.log('Order created successfully:', {
+    orderId: order?.id,
+    sessionId,
+    email: order?.email,
+    actorRunId: run.id,
+    datasetId: run.defaultDatasetId
+  });
+
+
 
   } catch (error) {
     console.error("Error in runApifyClient:", error);

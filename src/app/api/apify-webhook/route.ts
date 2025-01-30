@@ -39,9 +39,7 @@ export async function POST(req: NextRequest) {
     const { data: order, error: orderError } = await supabase
       .from("orders")
       .select("*")
-      .eq("executed", false)
-      .order("created_at", { ascending: false })
-      .limit(1)
+      .eq("run_id", actorRunId)
       .single();
 
     if (orderError || !order?.dataset_id) {
@@ -82,9 +80,8 @@ export async function POST(req: NextRequest) {
         .from("orders")
         .update({
           executed: true,
-          run_id: actorRunId,
         })
-        .eq("id", order.id);
+        .eq("run_id", actorRunId)
 
       if (updateError) {
         throw new Error(`Failed to update order status: ${updateError.message}`);
