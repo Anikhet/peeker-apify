@@ -30,17 +30,20 @@ export default function BuyApollo() {
   const [isListNameInvalid, setIsListNameInvalid] = useState(false); // New validation state
 
   const [price, setPrice] = useState(0);
-  const [referralId, setReferralId] = useState<string | null>(null);
   const searchParams = useSearchParams();
+  const [referralId, setReferralId] = useState<string | null>(null);
 
   useEffect(() => {
-    // Extract 'ref' parameter from the URL
-    const via = searchParams.get("via");
-    console.log("via", via);
-    if (via) {
-      setReferralId(via);
-    }
-  }, [searchParams]);
+    // Wait for hydration before extracting params
+    setTimeout(() => {
+      const ref = searchParams.get("via"); // Get 'via' parameter
+      console.log("Extracted via after delay:", ref);
+      if (ref) {
+        setReferralId(ref);
+      }
+    }, 500); // 500ms delay ensures hydration
+  }, [searchParams]); // Runs whenever searchParams updates
+  
   const handleLeadCountChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
     setLeadCount(value);
