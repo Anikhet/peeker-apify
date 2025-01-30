@@ -58,12 +58,11 @@ export async function POST(req: NextRequest) {
 			cancel_url: `${data.returnUrl}/payment-session/failure`,
 			allow_promotion_codes: true,
 			customer_creation: 'always', // Required for Rewardful
-			metadata: {
-				ref: data.referralId // Correct way to pass referral ID to Rewardful
-			}
+			client_reference_id: data.formData.referralId, // Pass referral ID to Rewardful
+			
 		});
 
-		 console.log('Referral ID:', data.referralId);
+		 console.log('Referral ID:', data.formData.referralId);
 		console.log('Success URL:', `${data.returnUrl}/payment-session/success?session_id={CHECKOUT_SESSION_ID}`);
 		console.log('Cancel URL:', `${data.returnUrl}/payment-session/failure`);
 
