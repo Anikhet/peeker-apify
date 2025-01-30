@@ -52,6 +52,10 @@ export interface Organization {
   founded_year?: number;
   // We'll store the fetched SEO description here:
   seo_description?: string;
+  raw_address?: string;
+  state?: string;
+  keywords?: string;
+
 }
 
 export interface DatasetItem {
@@ -59,6 +63,7 @@ export interface DatasetItem {
   first_name?: string;
   last_name?: string;
   email?: string;
+  personal_emails?: string[];
   title?: string;
   country?: string;
   city?: string;
@@ -74,6 +79,9 @@ export interface DatasetItem {
   organization_name?: string;
   organization_website_url?: string;
   organization_linkedin_url?: string;
+  estimated_num_employees?: number;
+  industry?: string;
+
 }
 
 // ---------------------------------------
@@ -126,18 +134,26 @@ export async function scrapeAndExportToCsv(dataset: DatasetItem[]) {
       "Headline",
       "Email",
       "Email Status",
+      "Personal Emails",
       "LinkedIn Link",
       "Lead City",
       "Lead State",
       "Lead Country",
       "Company Name",
       "Company Website",
+      "Company Facebook",
       "Company Twitter",
       "Company LinkedIn",
       "Company Phone",
       "Company Market Cap",
       "Company SEO Description",
       "Company Founded Year",
+      "Number of Employees",
+      "Industry",
+      "Company Address",
+      "Company State",
+      "Company Keywords",
+
     ];
 
     // 🔹 Explicitly map dataset to CSV format
@@ -149,18 +165,26 @@ export async function scrapeAndExportToCsv(dataset: DatasetItem[]) {
       "Headline": item.headline || "",
       "Email": item.email || "",
       "Email Status": item.email_status || "",
+      "Personal Emails": item.personal_emails || "",
       "LinkedIn Link": item.linkedin_url || "",
       "Lead City": item.city || "",
       "Lead State": item.state || "",
       "Lead Country": item.country || "",
       "Company Name": item.organization?.name || "",
       "Company Website": item.organization?.website_url || "",
+      "Company Facebook": item.organization?.facebook_url || "",
       "Company Twitter": item.organization?.twitter_url || "",
       "Company LinkedIn": item.organization?.linkedin_url || "",
       "Company Phone": item.organization?.primary_phone?.sanitized_number || "",
       "Company Market Cap": item.organization?.market_cap || "",
       "Company SEO Description": item.organization?.seo_description || "",  // 🔹 Ensure this is included
       "Company Founded Year": item.organization?.founded_year || "",
+      "Number of Employees": item.estimated_num_employees || "",
+      "Industry": item.industry || "",
+      "Company Address": item.organization?.raw_address || "",
+      "Company State" : item.organization?.state || "",
+      "Company Keywords": item.organization?.keywords || "",
+
     }));
 
     const opts = { fields };
@@ -174,5 +198,8 @@ export async function scrapeAndExportToCsv(dataset: DatasetItem[]) {
     throw error;
   }
 }
+
+
+
 
 
