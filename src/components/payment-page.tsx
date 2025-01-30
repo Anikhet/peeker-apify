@@ -2,13 +2,18 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Info } from "lucide-react";
+import { createClient } from '@supabase/supabase-js';
 
 export default function PaymentSuccessPageComponent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const session_id = searchParams.get('session_id');
   const [loading, setLoading] = useState(true);
+
   
+  
+
+
   
   interface SessionDetails {
     id: string;
@@ -17,7 +22,15 @@ export default function PaymentSuccessPageComponent() {
     // Add other fields as necessary
   }
 
+  interface Order {
+    id: string;
+    session_id: string;
+    price: number;
+    // Add other fields as necessary
+  }
+
   const [sessionDetails, setSessionDetails] = useState<SessionDetails | null>(null);
+  const [order, setOrder] = useState<Order | null>(null);
 
   useEffect(() => {
     if (!session_id) {
@@ -26,6 +39,24 @@ export default function PaymentSuccessPageComponent() {
     }
 
     const fetchSessionDetails = async () => {
+
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      );
+    
+      const { data: orderData, error: orderError } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('session_id', session_id)
+        .single();
+
+      if (orderError) {
+        console.error('Error fetching order:', orderError);
+      } else {
+        setOrder(orderData);
+      }
+
       try {
         const response = await fetch(`/api/stripe/payment-session?session_id=${session_id}`);
         if (!response.ok) throw new Error('Failed to fetch session details');
@@ -60,9 +91,9 @@ export default function PaymentSuccessPageComponent() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 text-center">
       <h1 className="text-4xl font-bold mb-6 text-green-600">🎉 Thank you for ordering!</h1>
-      <p className="text-xl mb-4">You just ordered your lead list for $${sessionDetails.amount / 100} for LINK </p>
+      <p className="text-xl mb-4">You just ordered your lead list for ${(order?.price ?? 0) / 100} </p>
       <p className="text-lg text-gray-600 mb-8">⁠You will receive your order within 12 hours      </p>
-      <p className='text-muted-foreground'><Info/> On average, your list will be delivered to your email within 4 hours.</p>
+      <p className='text-muted-foreground flex items-center justify-center'><Info/> On average, your list will be delivered to your email within 4 hours.</p>
       <button
         onClick={() => router.push('/apollo')}
         className="px-6 py-3 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition"
