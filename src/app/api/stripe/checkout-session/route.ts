@@ -58,9 +58,9 @@ export async function POST(req: NextRequest) {
 			cancel_url: `${data.returnUrl}/payment-session/failure`,
 			allow_promotion_codes: true,
 			customer_creation: 'always', // Required for Rewardful
-			client_reference_id: data.formData.referralId, // Pass referral ID to Rewardful
+			client_reference_id: data.formData.referralId || '', // Pass referral ID to Rewardful
 			metadata: {
-				referral: data.formData.referralId // Correct way to pass referral ID to Rewardful
+				referral: data.formData.referralId || '' // Correct way to pass referral ID to Rewardful
 			}
 			
 		});
