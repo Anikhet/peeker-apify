@@ -136,12 +136,12 @@ export default function BuyApollo() {
       return;
     }
 
-    const adjustedLeadCount = leadCount < 500 ? 500 : leadCount;
+    // const adjustedLeadCount = leadCount < 500 ? 500 : leadCount;
 
     // Payload for list processing
     const formData = {
       apolloURL,
-      leadCount: adjustedLeadCount,
+      leadCount,
       listName,
       personalEmails,
       workEmails,
