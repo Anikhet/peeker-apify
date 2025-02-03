@@ -114,10 +114,10 @@ export default function BuyApollo() {
     }
 
     // Validate Lead Count
-    if (!leadCount || leadCount < 100 || leadCount > 50000) {
+    if (!leadCount || leadCount < 500 || leadCount > 50000) {
       setIsLeadCountInvalid(true);
       toast.error("Invalid Lead Count", {
-        description: "Lead count must be between 100 and 50,000.",
+        description: "Lead count must be between 500 and 50,000.",
       });
       isValid = false;
     }
