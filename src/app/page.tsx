@@ -1,4 +1,5 @@
-import HomePage from '@/components/LandingPage'
+import HomePage from '@/components/HomePage'
+// import WebsiteDown from '@/components/WebsiteDown'
 import React, { Suspense } from 'react'
 
 const page = () => {
@@ -6,6 +7,9 @@ const page = () => {
     <Suspense fallback={<div>Loading...</div>}>
     <HomePage/>
     </Suspense>
+
+    // <WebsiteDown/>
+
   )
   
 }

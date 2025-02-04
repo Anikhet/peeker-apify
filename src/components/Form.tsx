@@ -263,7 +263,7 @@ export default function BuyApollo() {
             </div>
             { referral ? <input type="hidden" name="referral" value={referral} /> : null }
 
-            <RainbowButton className="mt-2" onClick={handleSubmit}>
+            <RainbowButton className="mt-10" onClick={handleSubmit}>
             {leadCount ? `Scrape for $${(leadCount * 0.005).toFixed(2)}` : "Scrape"}
             </RainbowButton>
           </form>
